@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { InputHTMLAttributes } from "react";
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -7,6 +8,12 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'>
     size?: 'sm' | 'md' | 'lg';
 }
 
+const sizeClasses = {
+    sm: 'h-8 px-3 text-sm',
+    md: 'h-10 px-3 text-base',
+    lg: 'h-12 px-3 text-md'
+};
+
 export function Input({
     label,
     hint,
@@ -14,42 +21,32 @@ export function Input({
     size = 'md',
     id,
     required,
+    className,
     ...rest
 }: InputProps) {
-    const height = size === 'sm' ? '32px' : size === 'lg' ? '48px' : '40px';
-    const fs = size === 'sm' ? 'var(--text-sm)' : 'var(--text-base)';
-    const pad = size === 'sm' ? '6px 12px' : '8px 12px';
-
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+        <div className="flex w-full flex-col gap-1">
             {label && (
-                <label htmlFor={id} style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', fontFamily: 'var(--font-sans)' }}>
+                <label htmlFor={id} className="text-sm font-medium text-text-secondary">
                     {label}
-                    {required && <span style={{ color: 'var(--color-danger-500)', marginLeft: 2}}>*</span>}
+                    {required && <span className="ml-0.5 text-danger-500">*</span>}
                 </label>
             )}
 
             <input
                 id={id}
                 required={required}
-                style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: fs,
-                    color: 'var(--color-text-primary)',
-                    background: rest.disabled ? 'var(--color-neutral-100)' : '#fff',
-                    border: `1.5px solid ${error ? 'var(--color-danger-500)' : 'var(--color-border)'}`,
-                    borderRadius: 'var(--radius-md)', 
-                    padding: pad,
-                    height,
-                    width: '100%',
-                    outline: 'none',
-                    transition: 'border-color var(--transition-base)',
-                    boxSizing: 'border-box',
-                }}
+                className={clsx(
+                    'w-full rounded-md border-[1.5px] font-sans text-text-primary outline-none transition-colors duration-150',
+                    'disabled:bg-neutral-100',
+                    error ? 'border-danger-500' : 'border-border',
+                    sizeClasses[size],
+                    className,
+                )}
                 {...rest}
             />
             {(hint || error) && (
-                <span style={{ fontSize: 'var(--text-xs)', color: error ? 'var(--color-danger-500)' : 'var(--color-text-muted)', fontFamily: 'var(--font-sans)' }}>
+                <span className={clsx('text-xs', error ? 'text-danger-500' : 'text-text-muted')}>
                     {error || hint}
                 </span>
             )}

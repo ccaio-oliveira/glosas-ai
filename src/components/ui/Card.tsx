@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { CSSProperties, ReactNode } from "react";
 
 interface CardProps {
@@ -6,6 +7,7 @@ interface CardProps {
     header?: ReactNode;
     footer?: ReactNode;
     style?: CSSProperties;
+    className?: string;
 }
 
 export function Card({
@@ -13,14 +15,15 @@ export function Card({
     padding,
     header,
     footer,
-    style
+    style,
+    className
 }: CardProps) {
     const p = padding ?? 'var(--card-padding)';
 
     return (
-        <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', border: 'var(--border-default)', overflow: 'hidden', ...style }}>
+        <div className={clsx('overflow-hidden rounded-lg border border-border bg-surface shadow-sm', className)} style={style}>
             {header && (
-                <div style={{ padding: `14px ${p}`, borderBottom: 'var(--border-default)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="flex items-center justify-between border-b border-border" style={{ padding: `14px ${p}` }}>
                     {header}
                 </div>
             )}
@@ -28,7 +31,7 @@ export function Card({
             <div style={{ padding: p }}>{children}</div>
 
             {footer && (
-                <div style={{ padding: `12px ${p}`, borderTop: 'var(--border-default)', background: 'var(--color-surface-2)' }}>
+                <div className="border-t border-border bg-surface-2" style={{ padding: `12px ${p}` }}>
                     {footer}
                 </div>
             )}

@@ -8,13 +8,13 @@ interface TopBarProps {
 
 export function TopBar({ title, subtitle, actions }: TopBarProps) {
     return (
-        <div style={{ height: 'var(--topbar-height)', background: 'var(--color-surface)', borderBottom: 'var(--border-default)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 var(--content-padding)', flexShrink: 0 }}>
+        <div className="flex h-[var(--topbar-height)] flex-shrink-0 items-center justify-between border-b border-border bg-surface px-[var(--content-padding)]">
             <div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 600, fontSize: 'var(--text-xl)', color: 'var(--color-text-primary)', lineHeight: 1.2 }}>{title}</div>
-                {subtitle && <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', marginTop: '1px' }}>{subtitle}</div>}
+                <div className="font-sans text-xl font-semibold leading-tight text-text-primary">{title}</div>
+                {subtitle && <div className="mt-px font-sans text-sm text-text-muted">{subtitle}</div>}
             </div>
 
-            {actions && <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{actions}</div>}
+            {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
     )
 }

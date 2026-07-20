@@ -11,11 +11,11 @@ interface AppLayoutProps {
 
 export function AppLayout({ title, subtitle, actions, children }: AppLayoutProps) {
     return (
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div className="flex min-h-screen">
             <Sidebar />
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div className="flex flex-1 flex-col">
                 <TopBar title={title} subtitle={subtitle} actions={actions} />
-                <div style={{ padding: 'var(--content-padding)', flex: 1 }}>{children}</div>
+                <div className="flex-1 p-[var(--content-padding)]">{children}</div>
             </div>
         </div>
     );

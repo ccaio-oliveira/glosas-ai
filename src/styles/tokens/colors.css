@@ -1,4 +1,4 @@
-:root {
+@theme {
   /* Brand — Azul Marinho */
   --color-brand-50:  oklch(97% 0.02 255);
   --color-brand-100: oklch(93% 0.05 255);

@@ -1,73 +1,56 @@
+import { cva, type VariantProps } from "class-variance-authority";
+import clsx from "clsx";
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'accent';
-type Size = 'xs' | 'sm' | 'md' | 'lg';
+const button = cva(
+    'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent font-semibold leading-none transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50',
+    {
+        variants: {
+            variant: {
+                primary: 'bg-brand-600 text-white border-brand-600 hover:bg-brand-700',
+                secondary: 'bg-transparent text-brand-600 border-brand-600 hover:bg-brand-50',
+                ghost: 'bg-transparent text-text-secondary border-border hover:bg-neutral-50',
+                danger: 'bg-danger-500 text-white border-danger-500 hover:bg-danger-600',
+                success: 'bg-success-500 text-white border-success-500 hover:bg-success-600',
+                accent: 'bg-accent-500 text-white border-accent-500 hover:bg-accent-600',
+            },
+            size: {
+                xs: 'h-[26px] px-2.5 text-xs rounded-sm gap-1',
+                sm: 'h-8 px-3 text-sm',
+                md: 'h-10 px-4 text-base',
+                lg: 'h-12 px-5 text-md',
+            },
+            fullWidth: {
+                true: 'w-full',
+            },
+        },
+        defaultVariants: {
+            variant: 'primary',
+            size: 'md',
+        },
+    },
+);
 
-interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
-    variant?: Variant;
-    size?: Size;
-    fullWidth?: boolean;
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'>, VariantProps<typeof button> {
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
 }
 
-const variants: Record<Variant, CSSProperties> = {
-    primary: { background: 'var(--color-brand-600)', color: '#fff', borderColor: 'var(--color-brand-600)' },
-    secondary: { background: 'transparent', color: 'var(--color-brand-600)', borderColor: 'var(--color-brand-600)' },
-    ghost: { background: 'transparent', color: 'var(--color-text-secondary)', borderColor: 'var(--color-border)' },
-    danger: { background: 'var(--color-danger-500)', color: '#fff', borderColor: 'var(--color-danger-500)' },
-    success: { background: 'var(--color-success-500)', color: '#fff', borderColor: 'var(--color-success-500)' },
-    accent: { background: 'var(--color-accent-500)', color: '#fff', borderColor: 'var(--color-accent-500)' },
-};
-
-const sizes: Record<Size, CSSProperties> = {
-    xs: { padding: '4px 10px', fontSize: 'var(--text-xs)', height: '26px', borderRadius: 'var(--radius-sm)', gap: '4px' },
-    sm: { padding: '6px 12px', fontSize: 'var(--text-sm)', height: '32px' },
-    md: { padding: '8px 16px', fontSize: 'var(--text-base)', height: '40px' },
-    lg: { padding: '10px 20px', fontSize: 'var(--text-md)', height: '48px' },
-};
-
 export function Button({
     children, 
-    variant = 'primary', 
-    size = 'md', 
-    disabled = false, 
-    fullWidth = false,
+    variant, 
+    size, 
+    fullWidth,
     leftIcon, 
     rightIcon,
-    style,
+    className,
     ...rest
 }: ButtonProps) {
     return (
-        <button
-            disabled={disabled}
-            style={{
-                fontFamily: 'var(--font-sans)',
-                fontWeight: 600,
-                borderRadius: 'var(--radius-md)',
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                opacity: disabled ? 0.5 : 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                transition: 'all var(--transition-base)',
-                width: fullWidth ? '100%' : 'auto',
-                border: '1.5px solid transparent',
-                outline: 'none',
-                whiteSpace: 'nowrap',
-                lineHeight: 1,
-                textDecoration: 'none',
-                userSelect: 'none',
-                ...variants[variant],
-                ...sizes[size],
-                ...style,
-            }}
-            {...rest}
-        >
-            {leftIcon && <span style={{ display: 'flex', alignItems: 'center' }}>{leftIcon}</span>}
+        <button className={clsx(button({ variant, size, fullWidth }), className)} {...rest}>
+            {leftIcon && <span className="flex items-center">{leftIcon}</span>}
             {children}
-            {rightIcon && <span style={{ display: 'flex', alignItems: 'center' }}>{rightIcon}</span>}
+            {rightIcon && <span className="flex items-center">{rightIcon}</span>}
         </button>
     );
 }
