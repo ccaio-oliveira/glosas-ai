@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Payers from "./pages/Payer";
+import Claims from "./pages/Claims";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,11 @@ export default function App() {
             <Route path="/payers" element={
               <ProtectedRoute>
                 <Payers />
+              </ProtectedRoute>
+            } />
+            <Route path="/claims" element={
+              <ProtectedRoute>
+                <Claims />
               </ProtectedRoute>
             } />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

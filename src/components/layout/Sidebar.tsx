@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const NAV_ITEMS = [
     { to: '/dashboard', label: 'Dashboard' },
+    { to: '/claims', label: 'Guias TISS' },
     { to: '/payers', label: 'Convênios' },
 ];
 
