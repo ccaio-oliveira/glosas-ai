@@ -1,5 +1,4 @@
 import { AppLayout } from "../components/layout/AppLayout";
-import { Button } from "../components/ui/Button";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Dashboard() {

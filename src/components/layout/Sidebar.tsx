@@ -13,9 +13,9 @@ export function Sidebar() {
         <div style={{ width: 'var(--sidebar-width)', minHeight: '100vh', background: 'var(--color-sidebar-bg)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
             <div style={{ padding: '20px 18px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.07)'}}>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: '19px', fontWeight: 800, color: '#fff', letterSpacing: '-0.025em', lineHeight: 1 }}>
-                    Glosas<span style={{ color: 'var(---color-accent-500)' }}>AI</span>
+                    Glosas<span style={{ color: 'var(--color-accent-500)' }}>AI</span>
                 </div>
-                <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.38)', marginTop: '3px' }}>{user?.clinic?.name}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.45)', marginTop: '3px' }}>{user?.clinic?.name}</div>
             </div>
 
             <nav style={{ padding: '8px', flex: 1, display: 'flex', flexDirection: 'column', gap: '1px' }}>
@@ -33,7 +33,7 @@ export function Sidebar() {
                             textDecoration: 'none',
                             background: isActive ? 'rgba(255, 255, 255, 0.11)' : 'transparent',
                             color: isActive ? '#fff' : 'rgba(255, 255, 255, 0.52)',
-                            fontSize: 'var(--text-sm)', 
+                            fontSize: 'var(--text-base)', 
                             fontWeight: isActive ? 600 : 400,
                             fontFamily: 'var(--font-sans)',
                             transition: 'all var(--transition-base)',
@@ -51,11 +51,11 @@ export function Sidebar() {
                     </div>
 
                     <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.05)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
-                        <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.35)' }}>{user?.role}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.45)' }}>{user?.role}</div>
                     </div>
 
-                    <button onClick={() => logout()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255, 255, 255, 0.3)', fontSize: '11px' }}>
+                    <button onClick={() => logout()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255, 255, 255, 0.5)', fontSize: '12px' }}>
                         Sair
                     </button>
                 </div>

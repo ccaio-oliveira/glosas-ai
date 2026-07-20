@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import Payers from "./pages/Payer";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,11 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/payers" element={
+              <ProtectedRoute>
+                <Payers />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </BrowserRouter>
