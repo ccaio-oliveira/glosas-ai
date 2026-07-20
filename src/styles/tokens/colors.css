@@ -1,0 +1,75 @@
+:root {
+  /* Brand — Azul Marinho */
+  --color-brand-50:  oklch(97% 0.02 255);
+  --color-brand-100: oklch(93% 0.05 255);
+  --color-brand-200: oklch(85% 0.09 255);
+  --color-brand-300: oklch(73% 0.12 255);
+  --color-brand-400: oklch(58% 0.15 255);
+  --color-brand-500: oklch(46% 0.17 255);
+  --color-brand-600: oklch(37% 0.16 255);
+  --color-brand-700: oklch(30% 0.14 255);
+  --color-brand-800: oklch(23% 0.11 255);
+  --color-brand-900: oklch(17% 0.08 255);
+
+  /* Success — Esmeralda (glosas recuperadas) */
+  --color-success-50:  oklch(97% 0.02 152);
+  --color-success-100: oklch(93% 0.05 152);
+  --color-success-500: oklch(58% 0.18 152);
+  --color-success-600: oklch(50% 0.17 152);
+  --color-success-700: oklch(42% 0.15 152);
+
+  /* Danger — Vermelho (glosas negadas/perdidas) */
+  --color-danger-50:  oklch(97% 0.02 25);
+  --color-danger-100: oklch(93% 0.05 25);
+  --color-danger-500: oklch(55% 0.22 25);
+  --color-danger-600: oklch(47% 0.20 25);
+  --color-danger-700: oklch(39% 0.18 25);
+
+  /* Warning — Âmbar (pendente) */
+  --color-warning-50:  oklch(97% 0.03 65);
+  --color-warning-100: oklch(93% 0.07 65);
+  --color-warning-500: oklch(70% 0.16 65);
+  --color-warning-600: oklch(62% 0.16 65);
+
+  /* Accent — Teal (IA / charts) */
+  --color-accent-50:  oklch(97% 0.02 195);
+  --color-accent-100: oklch(93% 0.05 195);
+  --color-accent-500: oklch(62% 0.18 195);
+  --color-accent-600: oklch(54% 0.17 195);
+
+  /* Neutral */
+  --color-neutral-50:  #F8FAFC;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
+
+  /* Semânticas */
+  --color-bg:            #F0F3FA;
+  --color-surface:       #FFFFFF;
+  --color-surface-2:     var(--color-neutral-100);
+  --color-border:        var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
+  --color-text-primary:  var(--color-neutral-900);
+  --color-text-secondary:var(--color-neutral-600);
+  --color-text-muted:    var(--color-neutral-400);
+  --color-text-inverse:  #FFFFFF;
+
+  /* Sidebar */
+  --color-sidebar-bg:     oklch(13% 0.07 258);
+  --color-sidebar-hover:  oklch(20% 0.08 258);
+  --color-sidebar-active: oklch(27% 0.10 258);
+  --color-sidebar-text:   oklch(82% 0.03 258);
+
+  /* Status de glosas */
+  --color-status-recuperada: var(--color-success-500);
+  --color-status-contestada: var(--color-brand-500);
+  --color-status-pendente:   var(--color-warning-500);
+  --color-status-negada:     var(--color-danger-500);
+  --color-status-nova:       var(--color-neutral-400);
+}

@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useState, type FormEvent } from "react";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
 
 export default function Login() {
     const { login } = useAuth();
@@ -33,12 +35,12 @@ export default function Login() {
                 
                 {error && <p>{error}</p>}
 
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="E-mail" />
-                <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Senha" />
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="E-mail" />
+                <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Senha" />
 
-                <button type="submit" disabled={submitting}>
+                <Button type="submit" disabled={submitting}>
                     {submitting ? 'Entrando...' : 'Entrar'}
-                </button>
+                </Button>
             </form>
         </div>
     );

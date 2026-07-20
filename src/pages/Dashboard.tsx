@@ -1,17 +1,15 @@
+import { AppLayout } from "../components/layout/AppLayout";
+import { Button } from "../components/ui/Button";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Dashboard() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
 
     return (
-        <div style={{ padding: 24 }}>
-            <h1>Dashboard</h1>
-
+        <AppLayout title="Dashboard" subtitle="Bem-vinda de volta">
             <p>
                 Logado como {user?.name} - {user?.clinic?.name}
             </p>
-
-            <button onClick={() => logout()}>Sair</button>
-        </div>
+        </AppLayout>
     );
 }
