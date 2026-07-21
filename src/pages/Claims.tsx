@@ -105,7 +105,7 @@ export default function Claims() {
                             >
                                 <option value="">Selecione...</option>
                                 {payers?.map((payer) => (
-                                    <option key={payer.id} value={payer.id}>{payer.name}</option>
+                                    <option key={payer.id} value={payer.payer_id}>{payer.name}</option>
                                 ))}
                             </select>
                         </div>

@@ -2,12 +2,10 @@ import { api } from "./api";
 
 export interface Payer {
     id: number;
-    clinic_id: number;
+    payer_id: number;
     name: string;
     ans_registry_code: string | null;
     integration_type: 'manual' | 'tiss_webservice';
-    created_at: string;
-    updated_at: string;
 }
 
 export interface PayerInput {

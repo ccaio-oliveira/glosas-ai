@@ -1,11 +1,10 @@
 import { api } from "./api";
-import type { Payer } from "./payers";
 
 export interface Claim {
     id: number;
     clinic_id: number;
     payer_id: number;
-    payer?: Payer;
+    payer?: { id: number; name: string; ans_registry_code: string | null };
     claim_number: string;
     patient_name: string;
     total_amount: string;
