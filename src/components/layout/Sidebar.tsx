@@ -5,8 +5,13 @@ import clsx from "clsx";
 const NAV_ITEMS = [
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/claims', label: 'Guias TISS' },
-    { to: '/payers', label: 'Convênios' },
 ];
+
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    clsx(
+        'flex items-center gap-2.5 rounded-md px-2.5 py-2.5 font-sans text-base no-underline transition-colors duration-150',
+        isActive ? 'bg-white/11 font-semibold text-white' : 'font-normal text-white/50',
+    );
 
 export function Sidebar() {
     const { user, logout } = useAuth();
@@ -25,11 +30,7 @@ export function Sidebar() {
                     <NavLink
                         key={item.to}
                         to={item.to}
-                        className={({ isActive }) =>
-                        clsx(
-                            'flex items-center gap-2.5 rounded-md px-2.5 py-2.5 font-sans text-base no-underline transition-colors duration-150',
-                            isActive ? 'bg-white/11 font-semibold text-white' : 'font-normal text-white/50',
-                        )}
+                        className={navLinkClass}
                     >
                         {item.label}
                     </NavLink>
@@ -37,6 +38,10 @@ export function Sidebar() {
             </nav>
 
             <div className="border-t border-white/7 p-2">
+                <NavLink to="/settings" className={navLinkClass}>
+                    Configurações
+                </NavLink>
+
                 <div className="m-1 mt-2 flex items-center gap-2 rounded-md bg-white/5 px-2.5 py-2">
                     <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white">
                         {user?.name?.charAt(0)}

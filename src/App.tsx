@@ -4,8 +4,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
-import Payers from "./pages/Payer";
 import Claims from "./pages/Claims";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -24,9 +24,9 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/payers" element={
+            <Route path="/settings" element={
               <ProtectedRoute>
-                <Payers />
+                <Settings />
               </ProtectedRoute>
             } />
             <Route path="/claims" element={

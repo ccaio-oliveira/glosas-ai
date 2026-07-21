@@ -1,16 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createPayer, deletePayer, listPayers, updatePayer, type Payer, type PayerInput } from "../lib/payers";
+import { createPayer, deletePayer, listPayers, updatePayer, type Payer, type PayerInput } from "../../lib/payers";
 import { useState } from "react";
-import { AppLayout } from "../components/layout/AppLayout";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
-import { Input } from "../components/ui/Input";
+import { Button } from "../ui/Button";
+import { Card } from "../ui/Card";
+import { Input } from "../ui/Input";
 
 const emptyForm: PayerInput = { name: '', ans_registry_code: '', integration_type: 'manual' };
 
-export default function Payers() {
+export function PayersPanel() {
     const queryClient = useQueryClient();
-    const {data: payers, isLoading } = useQuery({ queryKey: ['payers'], queryFn: listPayers });
+    const { data: payers, isLoading } = useQuery({ queryKey: ['payers'], queryFn: listPayers });
 
     const [editingId, setEditingId] = useState<number | null>(null);
     const [form, setForm] = useState<PayerInput>(emptyForm);
@@ -29,7 +28,7 @@ export default function Payers() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['payers'] });
             closeForm();
-        }
+        },
     });
 
     const deleteMutation = useMutation({
@@ -54,9 +53,9 @@ export default function Payers() {
     }
 
     function closeForm() {
+        setShowForm(false);
         setEditingId(null);
         setForm(emptyForm);
-        setShowForm(false);
     }
 
     function handleSubmit() {
@@ -68,14 +67,20 @@ export default function Payers() {
     }
 
     return (
-        <AppLayout
-            title="Convênios"
-            subtitle="Operadoras vinculadas à sua clínica"
-            actions={<Button size="sm" onClick={openCreateForm}>Novo Convênio</Button>}
-        >
+        <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="font-sans text-base font-semibold text-text-primary">Convênios</h2>
+
+                    <p className="font-sans text-sm text-text-muted">Operadoras vinculadas à sua clínica</p>
+                </div>
+
+                <Button size="sm" onClick={openCreateForm}>Novo convênio</Button>
+            </div>
+
             {showForm && (
-                <Card style={{ marginBottom: 16 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 420 }}>
+                <Card>
+                    <div className="flex max-w-[420px] flex-col gap-3">
                         <Input
                             label="Nome"
                             required
@@ -89,24 +94,22 @@ export default function Payers() {
                             onChange={(e) => setForm({ ...form, ans_registry_code: e.target.value })}
                         />
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-                                Tipo de Integração
-                            </label>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-medium text-text-secondary">Tipo de integração</label>
 
                             <select
                                 value={form.integration_type}
                                 onChange={(e) => setForm({ ...form, integration_type: e.target.value as PayerInput['integration_type'] })}
-                                style={{ height: 40, border: '1.5px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '0 12px', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)' }}
+                                className="h-10 rounded-md border-[1.5px] border-border px-3 font-sans text-base"
                             >
                                 <option value="manual">Manual</option>
-                                <option value="tiss_webservice">WebService TISS</option>
+                                <option value="tiss_webservice">Webservice TISS</option>
                             </select>
                         </div>
 
-                        <div style={{ display: 'flex', gap: 8 }}>
+                        <div className="flex gap-2">
                             <Button onClick={handleSubmit} disabled={!form.name || createMutation.isPending || updateMutation.isPending}>
-                                {editingId ? 'Atualizar' : 'Criar'}
+                                {editingId ? 'Salvar' : 'Criar'}
                             </Button>
 
                             <Button variant="ghost" onClick={closeForm}>Cancelar</Button>
@@ -114,18 +117,18 @@ export default function Payers() {
                     </div>
                 </Card>
             )}
-            
+
             <Card padding="0">
-                {isLoading && <p style={{ padding: 20 }}>Carregando...</p>}
+                {isLoading && <p className="p-5">Carregando...</p>}
 
-                {!isLoading && payers?.length === 0 && <p style={{ padding: 20  }}>Nenhum convênio cadastrado ainda.</p>}
+                {!isLoading && payers?.length === 0 && <p className="p-5">Nenhum convênio cadastrado ainda.</p>}
 
-                {!isLoading && payers && payers?.length > 0 && (
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                {!isLoading && payers && payers.length > 0 && (
+                    <table className="w-full border-collapse">
                         <thead>
-                            <tr style={{ background: 'var(--color-neutral-50)' }}>
+                            <tr className="bg-neutral-50">
                                 {['Nome', 'Registro ANS', 'Integração', ''].map((h) => (
-                                    <th key={h} style={{ padding: '9px 16px', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-muted)', textAlign: 'left', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border)' }}>
+                                    <th key={h} className="border-b border-border px-4 py-2.5 text-left text-[11px] font-semibold uppercase text-text-muted">
                                         {h}
                                     </th>
                                 ))}
@@ -134,12 +137,12 @@ export default function Payers() {
 
                         <tbody>
                             {payers.map((payer) => (
-                                <tr key={payer.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                                    <td style={{ padding: '10px 16px' }}>{payer.name}</td>
-                                    <td style={{ padding: '10px 16px' }}>{payer.ans_registry_code}</td>
-                                    <td style={{ padding: '10px 16px' }}>{payer.integration_type === 'manual' ? 'Manual' : 'WebService TISS'}</td>
-                                    <td style={{ padding: '10px 16px' }}>
-                                        <Button size="xs" variant="ghost" onClick={() => openEditForm(payer)}>Editar</Button>
+                                <tr key={payer.id} className="border-b border-border">
+                                    <td className="px-4 py-2.5">{payer.name}</td>
+                                    <td className="px-4 py-2.5">{payer.ans_registry_code || '-'}</td>
+                                    <td className="px-4 py-2.5">{payer.integration_type === 'manual' ? 'Manual' : 'Webservice TISS'}</td>
+                                    <td className="px-4 py-2.5 text-right">
+                                        <Button size="xs" variant="ghost" onClick={() => openEditForm(payer)}>Editar</Button>{' '}
                                         <Button size="xs" variant="danger" onClick={() => deleteMutation.mutate(payer.id)}>Excluir</Button>
                                     </td>
                                 </tr>
@@ -148,6 +151,6 @@ export default function Payers() {
                     </table>
                 )}
             </Card>
-        </AppLayout>
-    );
+        </div>
+    )
 }
