@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Claims from "./pages/Claims";
 import Settings from "./pages/Settings";
+import PayersAdmin from "./pages/PayersAdmin";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,11 @@ export default function App() {
             <Route path="/claims" element={
               <ProtectedRoute>
                 <Claims />
+              </ProtectedRoute>
+            } />
+            <Route path="/payers" element={
+              <ProtectedRoute>
+                <PayersAdmin />
               </ProtectedRoute>
             } />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -6,6 +6,7 @@ import { AppLayout } from "../components/layout/AppLayout";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
+import { Link } from "react-router-dom";
 
 const emptyForm: ClaimInput = { payer_id: '', claim_number: '', patient_name: '', total_amount: '' };
 
@@ -88,7 +89,12 @@ export default function Claims() {
         <AppLayout
             title="Guias TISS"
             subtitle="Guias cadastradas da sua clínica"
-            actions={<Button size="sm" onClick={openCreateForm}>Nova Guia</Button>}
+            actions={
+                <>
+                    <Link to="/payers" className="text-sm text-brand-600 hover:underline">Gerenciar convênios</Link>
+                    <Button size="sm" onClick={openCreateForm}>Nova Guia</Button>
+                </>
+            }
         >
             {showForm && (
                 <Card style={{ marginBottom: 16 }}>

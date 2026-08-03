@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import clsx from "clsx";
+import { roleLabel } from "../../lib/roles";
 
 const NAV_ITEMS = [
     { to: '/dashboard', label: 'Dashboard' },
@@ -49,7 +50,7 @@ export function Sidebar() {
 
                     <div className="min-w-0 flex-1">
                         <div className="truncate text-[13px] font-semibold text-white/85">{user?.name}</div>
-                        <div className="text-[11px] text-white/45">{user?.role}</div>
+                        <div className="text-[11px] text-white/45">{user ? roleLabel[user.role] ?? user.role : ''}</div>
                     </div>
 
                     <button onClick={() => logout()} className="text-xs text-white/50 hover:text-white/80">

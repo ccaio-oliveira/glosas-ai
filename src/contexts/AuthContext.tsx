@@ -5,7 +5,7 @@ interface User {
     id: number;
     name: string;
     email: string;
-    role: 'owner' | 'biller' | 'super_admin';
+    role: 'owner' | 'biller' | 'viewer' | 'super_admin';
     clinic: { id: number; name: string } | null;
 }
 

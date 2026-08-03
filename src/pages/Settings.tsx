@@ -2,38 +2,46 @@ import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import clsx from "clsx";
 import { PayersPanel } from "../components/settings/PayersPanel";
+import { ClinicPanel } from "../components/settings/ClinicPanel";
+import { BillingPanel } from "../components/settings/BillingPanel";
+import { UsersPanel } from "../components/settings/UserPanel";
+import { IntegrationsPanel } from "../components/settings/IntegrationsPanel";
 
 const TABS = [
-    { id: 'payers', label: 'Convênios', enabled: true },
-    { id: 'users', label: 'Usuários', enabled: false },
-    { id: 'billing', label: 'Assinatura', enabled: false },
+    { id: 'clinic', label: 'Dados da Clínica' },
+    { id: 'billing', label: 'Plano & Cobrança' },
+    { id: 'users', label: 'Usuários' },
+    { id: 'integrations', label: 'Integrações' },
 ] as const;
 
 export default function Settings() {
-    const [tab, setTab] = useState<(typeof TABS)[number]['id']>('payers');
+    const [tab, setTab] = useState<(typeof TABS)[number]['id']>('clinic');
 
     return (
-        <AppLayout title="Configurações" subtitle="Preferências da sua clínica">
-            <div className="mb-4 flex gap-1 border-b border-border">
-                {TABS.map((t) => (
-                    <button
-                        key={t.id}
-                        disabled={!t.enabled}
-                        onClick={() => t.enabled && setTab(t.id)}
-                        className={clsx(
-                            'border-b-2 px-3 py-2 font-sans text-sm font-medium transition-colors duration-150',
-                            !t.enabled && 'cursor-not-allowed text-text-muted/50',
-                            t.enabled && tab === t.id && 'border-brand-600 text-brand-600',
-                            t.enabled && tab !== t.id && 'border-transparent text-text-secondary hover:text-text-primary',
-                        )}
-                    >
-                        {t.label}
-                        {!t.enabled && ' (em breve)'}
-                    </button>
-                ))}
-            </div>
+        <AppLayout title="Configurações" subtitle="Gerencie sua conta, clínica e assinatura">
+            <div className="flex gap-6">
+                <nav className="flex w-56 flex-shrink-0 flex-col gap-1">
+                    {TABS.map((t) => (
+                        <button
+                            key={t.id}
+                            onClick={() => setTab(t.id)}
+                            className={clsx(
+                                'rounded-md px-3 py-2 text-left font-sans text-sm font-medium transition-colors duration-150',
+                                tab === t.id ? 'bg-brand-50 text-brand-700' : 'text-text-secondary hover:bg-neutral-50',
+                            )}
+                        >
+                            {t.label}
+                        </button>
+                    ))}
+                </nav>
 
-            {tab === 'payers' && <PayersPanel />}
+                <div className="flex-1">
+                    {tab === 'clinic' && <ClinicPanel />}
+                    {tab === 'billing' && <BillingPanel />}
+                    {tab === 'users' && <UsersPanel />}
+                    {tab === 'integrations' && <IntegrationsPanel />}
+                </div>
+            </div>
         </AppLayout>
     )
 }
