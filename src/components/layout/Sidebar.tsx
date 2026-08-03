@@ -5,7 +5,7 @@ import { roleLabel } from "../../lib/roles";
 
 const NAV_ITEMS = [
     { to: '/dashboard', label: 'Dashboard' },
-    { to: '/claims', label: 'Guias TISS' },
+    { to: '/upload', label: 'Upload TISS' },
 ];
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
