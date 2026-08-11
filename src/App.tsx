@@ -8,6 +8,8 @@ import Claims from "./pages/Claims";
 import Settings from "./pages/Settings";
 import PayersAdmin from "./pages/PayersAdmin";
 import UploadTiss from "./pages/UploadTiss";
+import Denials from "./pages/Denials";
+import DenialDetail from "./pages/DenialDetail";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,16 @@ export default function App() {
             <Route path="/upload" element={
               <ProtectedRoute>
                 <UploadTiss />
+              </ProtectedRoute>
+            } />
+            <Route path="/denials" element={
+              <ProtectedRoute>
+                <Denials />
+              </ProtectedRoute>
+            } />
+            <Route path="/denials/:id" element={
+              <ProtectedRoute>
+                <DenialDetail />
               </ProtectedRoute>
             } />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

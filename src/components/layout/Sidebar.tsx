@@ -2,9 +2,12 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import clsx from "clsx";
 import { roleLabel } from "../../lib/roles";
+import { useQuery } from "@tanstack/react-query";
+import { getDenialSummary } from "../../lib/denials";
 
 const NAV_ITEMS = [
     { to: '/dashboard', label: 'Dashboard' },
+    { to: '/denials', label: 'Glosas' },
     { to: '/upload', label: 'Upload TISS' },
 ];
 
@@ -16,6 +19,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Sidebar() {
     const { user, logout } = useAuth();
+    const { data: summary } = useQuery({ queryKey: ['denial-summary'], queryFn: getDenialSummary });
 
     return (
         <div className="flex min-h-screen w-[var(--sidebar-width)] flex-shrink-0 flex-col bg-sidebar-bg">
@@ -33,7 +37,12 @@ export function Sidebar() {
                         to={item.to}
                         className={navLinkClass}
                     >
-                        {item.label}
+                        <span className="flex-1">{item.label}</span>
+                        {item.to === '/denials' && !!summary?.open_count && (
+                            <span className="rounded-full bg-danger-500 px-1.5 py-px text-[10px] font-bold text-white">
+                                {summary.open_count}
+                            </span>
+                        )}
                     </NavLink>
                 ))}
             </nav>
