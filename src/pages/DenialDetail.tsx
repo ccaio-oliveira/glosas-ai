@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, formatBRL, getDenial, saveAppeal, submitAppeal, updateDenialStatus } from "../lib/denials";
+import { categoryLabel, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus } from "../lib/denials";
 import { useEffect, useState } from "react";
 import { STATUS_OPTIONS, StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
 import { AppLayout } from "../components/layout/AppLayout";
@@ -36,6 +36,8 @@ export default function DenialDetail() {
     });
 
     const [text, setText] = useState('');
+    const [genInfo, setGenInfo] = useState<GenerateAppealResult | null>(null);
+    const [genError, setGenError] = useState<string | null>(null);
 
     useEffect(() => {
         setText(denial?.appeal?.ai_generated_text ?? '');
@@ -50,6 +52,21 @@ export default function DenialDetail() {
     const saveMutation = useMutation({ mutationFn: () => saveAppeal(denialId, text), onSuccess: invalidate });
     const submitMutation = useMutation({ mutationFn: () => submitAppeal(denialId), onSuccess: invalidate });
     const statusMutation = useMutation({ mutationFn: (status: DenialStatus) => updateDenialStatus(denialId, status), onSuccess: invalidate });
+
+    const generateMutation = useMutation({
+        mutationFn: () => generateAppeal(denialId),
+        onSuccess: (result) => {
+            setText(result.appeal.ai_generated_text ?? '');
+            setGenInfo(result);
+            setGenError(null);
+            invalidate();
+        },
+        onError: (error) => {
+            const status = (error as { response?: { status?: number } }).response?.status;
+            setGenError(status === 422 ? 'Nenhum modelo cobre este código ainda - escreva o recurso manualmente por enquanto.' : 'Falha ao gerar o recurso. Verifique o console para detalhes.');
+            setGenInfo(null);
+        },
+    });
 
     if (isLoading || !denial) {
         return <AppLayout title="Glosas"><p className="text-text-muted">Carregando...</p></AppLayout>
@@ -121,6 +138,41 @@ export default function DenialDetail() {
                     </div>
 
                     <div className="p-4">
+                        <div className="mb-3 flex items-center justify-between">
+                            <span className="text-xs text-text-muted">
+                                {denial.appeal?.generation_source ? sourceLabel[denial.appeal.generation_source] : 'Sem recurso gerado'}
+                            </span>
+
+                            <Button size="xs" variant="accent" onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending}>
+                                {generateMutation.isPending ? 'Gerando...' : 'Gerar recurso'}
+                            </Button>
+                        </div>
+
+                        {genError && <p className="mb-3 text-xs text-danger-600">{genError}</p>}
+
+                        {genInfo && (
+                            <div className="mb-3 flex flex-col gap-2 rounded-md bg-neutral-50 p-3 text-xs">
+                                <div className="text-text-secondary">
+                                    Modelo aplicado: <strong>{genInfo.template_name}</strong> ({sourceLabel[genInfo.source]})
+                                </div>
+
+                                {genInfo.requires_clinical_input && (
+                                    <div className="text-warning-600">
+                                        Fundamentação legal não cadastrada neste modelo - preencha antes de enviar.
+                                    </div>
+                                )}
+
+                                {genInfo.attachments.length > 0 && (
+                                    <div className="text-text-secondary">
+                                        <div className="font-semibold">Anexar:</div>
+                                        <ul className="mt-1 list-inside list-disc">
+                                            {genInfo.attachments.map((a) => <li key={a}>{a}</li>)}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <textarea
                             value={text}
                             onChange={(e) => setText(e.target.value)}
@@ -135,7 +187,7 @@ export default function DenialDetail() {
                         )}
 
                         <p className="mt-2 text-xs text-text-muted">
-                            A geração automática com IA é o próximo passo - vai preencher este mesmo campo.
+                            Gerado por modelo determinístico, sem custo de IA. Revise antes de enviar.
                         </p>
                     </div>
 

@@ -25,6 +25,7 @@ export interface Appeal {
     id: number;
     denial_id: number;
     ai_generated_text: string | null;
+    generation_source: string | null;
     status: 'draft' | 'submitted' | 'accepted' | 'rejected';
     submitted_at: string | null;
 }
@@ -41,11 +42,28 @@ export interface DenialSummary {
     needs_ai_review_count: number;
 }
 
+export interface GenerateAppealResult {
+    appeal: Appeal;
+    source: 'template_code' | 'template_group' | 'template_category';
+    template_name: string;
+    attachments: string[];
+    requires_clinical_input: boolean;
+    missing_legal_basis: boolean;
+}
+
 export const categoryLabel: Record<DenialCategory, string> = {
     administrative: 'Administrativa',
     technical: 'Técnica',
     linear: 'Linear',
     unknown: 'Não classificada',
+};
+
+export const sourceLabel: Record<string, string> = {
+    template_code: 'Modelo específico do código',
+    template_group: 'Modelo do grupo TISS',
+    template_category: 'Modelo genérico da categoria',
+    ai: 'Gerado por IA',
+    manual: 'Escrito manualmente',
 };
 
 export async function listDenials(filters: { search?: string; status?: string; category?: string }) {
@@ -75,6 +93,11 @@ export async function saveAppeal(denialId: number, text: string) {
 
 export async function submitAppeal(denialId: number) {
     const res = await api.post<Appeal>(`/api/denials/${denialId}/appeal/submit`);
+    return res.data;
+}
+
+export async function generateAppeal(denialId: number) {
+    const res = await api.post<GenerateAppealResult>(`/api/denials/${denialId}/appeal/generate`);
     return res.data;
 }
 
