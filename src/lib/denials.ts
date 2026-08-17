@@ -26,6 +26,7 @@ export interface Appeal {
     denial_id: number;
     ai_generated_text: string | null;
     generation_source: string | null;
+    document_path: string | null;
     status: 'draft' | 'submitted' | 'accepted' | 'rejected';
     submitted_at: string | null;
 }
@@ -99,6 +100,22 @@ export async function submitAppeal(denialId: number) {
 export async function generateAppeal(denialId: number) {
     const res = await api.post<GenerateAppealResult>(`/api/denials/${denialId}/appeal/generate`);
     return res.data;
+}
+
+export async function downloadAppealPdf(denialId: number) {
+    const res = await api.get(`/api/denials/${denialId}/appeal/pdf`, {
+        responseType: 'blob'
+    });
+
+    const disposition = res.headers['content-disposition'] as string | undefined;
+    const filename = disposition?.match(/filename="?([^"]+)"?/)?.[1] ?? `recurso-glosa-${denialId}.pdf`;
+
+    const url = URL.createObjectURL(res.data as Blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
 }
 
 export function formatBRL(value: number) {

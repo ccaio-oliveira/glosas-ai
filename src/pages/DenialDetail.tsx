@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus } from "../lib/denials";
+import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus } from "../lib/denials";
 import { useEffect, useState } from "react";
 import { STATUS_OPTIONS, StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
 import { AppLayout } from "../components/layout/AppLayout";
@@ -52,6 +52,7 @@ export default function DenialDetail() {
     const saveMutation = useMutation({ mutationFn: () => saveAppeal(denialId, text), onSuccess: invalidate });
     const submitMutation = useMutation({ mutationFn: () => submitAppeal(denialId), onSuccess: invalidate });
     const statusMutation = useMutation({ mutationFn: (status: DenialStatus) => updateDenialStatus(denialId, status), onSuccess: invalidate });
+    const pdfMutation = useMutation({ mutationFn: () => downloadAppealPdf(denialId) });
 
     const generateMutation = useMutation({
         mutationFn: () => generateAppeal(denialId),
@@ -199,6 +200,16 @@ export default function DenialDetail() {
                             disabled={!text.trim() || !isDirty || saveMutation.isPending}
                         >
                             {isDirty ? 'Salvar' : 'Salvo'}
+                        </Button>
+
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            fullWidth
+                            onClick={() => pdfMutation.mutate()}
+                            disabled={!savedText || pdfMutation.isPending}
+                        >
+                            {pdfMutation.isPending ? 'Gerando...' : 'PDF'}
                         </Button>
                         
                         <Button
