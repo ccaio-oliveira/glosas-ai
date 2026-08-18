@@ -27,8 +27,9 @@ export interface Appeal {
     ai_generated_text: string | null;
     generation_source: string | null;
     document_path: string | null;
-    status: 'draft' | 'submitted' | 'accepted' | 'rejected';
+    status: 'draft' | 'submitted' | 'under_review' | 'accepted' | 'rejected';
     submitted_at: string | null;
+    responded_at: string | null;
 }
 
 export interface DenialDetail extends Denial {

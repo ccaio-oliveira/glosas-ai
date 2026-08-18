@@ -4,11 +4,13 @@ import clsx from "clsx";
 import { roleLabel } from "../../lib/roles";
 import { useQuery } from "@tanstack/react-query";
 import { getDenialSummary } from "../../lib/denials";
+import { FileCheck2, FileX2, LayoutDashboard, Upload, Settings } from "lucide-react";
 
 const NAV_ITEMS = [
-    { to: '/dashboard', label: 'Dashboard' },
-    { to: '/denials', label: 'Glosas' },
-    { to: '/upload', label: 'Upload TISS' },
+    { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+    { to: '/denials', label: 'Glosas', Icon: FileX2 },
+    { to: '/appeals', label: 'Recursos', Icon: FileCheck2 },
+    { to: '/upload', label: 'Upload TISS', Icon: Upload },
 ];
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -37,6 +39,7 @@ export function Sidebar() {
                         to={item.to}
                         className={navLinkClass}
                     >
+                        <item.Icon size={17} strokeWidth={1.75} className="flex-shrink-0" />
                         <span className="flex-1">{item.label}</span>
                         {item.to === '/denials' && !!summary?.open_count && (
                             <span className="rounded-full bg-danger-500 px-1.5 py-px text-[10px] font-bold text-white">
@@ -49,7 +52,8 @@ export function Sidebar() {
 
             <div className="border-t border-white/7 p-2">
                 <NavLink to="/settings" className={navLinkClass}>
-                    Configurações
+                    <Settings size={17} strokeWidth={1.75} className="flex-shrink-0" />
+                    <span className="flex-1">Configurações</span>
                 </NavLink>
 
                 <div className="m-1 mt-2 flex items-center gap-2 rounded-md bg-white/5 px-2.5 py-2">

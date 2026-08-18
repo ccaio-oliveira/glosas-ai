@@ -6,6 +6,7 @@ import { STATUS_OPTIONS, StatusBadge, type DenialStatus } from "../components/da
 import { AppLayout } from "../components/layout/AppLayout";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
+import { AppealStatusBadge } from "../components/data/AppealStatusBadge";
 
 function Field({ label, value, mono, highlight }: { label: string; value: string; mono?: boolean; highlight?: boolean }) {
     return (
@@ -140,9 +141,13 @@ export default function DenialDetail() {
 
                     <div className="p-4">
                         <div className="mb-3 flex items-center justify-between">
-                            <span className="text-xs text-text-muted">
-                                {denial.appeal?.generation_source ? sourceLabel[denial.appeal.generation_source] : 'Sem recurso gerado'}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                {denial.appeal && <AppealStatusBadge status={denial.appeal.status} />}
+
+                                <span className="text-xs text-text-muted">
+                                    {denial.appeal?.generation_source ? sourceLabel[denial.appeal.generation_source] : 'Sem recurso gerado'}
+                                </span>
+                            </div>
 
                             <Button size="xs" variant="accent" onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending}>
                                 {generateMutation.isPending ? 'Gerando...' : 'Gerar recurso'}
