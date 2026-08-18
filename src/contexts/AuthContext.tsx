@@ -12,7 +12,7 @@ interface User {
 interface AuthContextValue {
     user: User | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<User>;
     logout: () => Promise<void>;
 }
 
@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const res = await api.get<User>('/api/user');
         setUser(res.data);
+        return res.data;
     }
 
     async function logout() {

@@ -19,8 +19,8 @@ export default function Login() {
         setSubmitting(true);
 
         try {
-            await login(email, password);
-            navigate('/dashboard');
+            const loggedUser = await login(email, password);
+            navigate(loggedUser.role === 'super_admin' ? '/admin/errors' : '/dashboard');
         } catch {
             setError('E-mail ou senha inválidos.');
         } finally {

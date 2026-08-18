@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -10,8 +10,18 @@ import PayersAdmin from "./pages/PayersAdmin";
 import UploadTiss from "./pages/UploadTiss";
 import Denials from "./pages/Denials";
 import DenialDetail from "./pages/DenialDetail";
+import SuperAdminRoute from "./components/SuperAdminRoute";
+import ErrorLogs from './pages/admin/ErrorLogs';
 
 const queryClient = new QueryClient();
+
+function RootRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+
+  return <Navigate to={user.role === 'super_admin' ? '/admin/errors' : '/dashboard'} replace />;
+}
 
 export default function App() {
   return (
@@ -58,7 +68,12 @@ export default function App() {
                 <DenialDetail />
               </ProtectedRoute>
             } />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/admin/errors" element={
+              <SuperAdminRoute> 
+                <ErrorLogs />
+              </SuperAdminRoute>
+            } />
+            <Route path="*" element={<RootRedirect />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
