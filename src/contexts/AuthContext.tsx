@@ -1,12 +1,20 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, ensureCsrfCookie } from "../lib/api";
 
+export interface Permissions {
+    operate: boolean;
+    manage_clinic: boolean;
+    manage_users: boolean;
+    manage_billing: boolean;
+}
+
 interface User {
     id: number;
     name: string;
     email: string;
     role: 'owner' | 'biller' | 'viewer' | 'super_admin';
     clinic: { id: number; name: string } | null;
+    permissions: Permissions;
 }
 
 interface AuthContextValue {
@@ -57,4 +65,14 @@ export function useAuth() {
     if (!ctx) throw new Error('useAuth must be used within AuthProvider');
 
     return ctx;
+}
+
+export function useCan(): Permissions {
+    const { user } = useAuth();
+    return user?.permissions ?? {
+        operate: false,
+        manage_clinic: false,
+        manage_users: false,
+        manage_billing: false,
+    };
 }

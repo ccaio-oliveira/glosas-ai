@@ -12,7 +12,7 @@ import Denials from "./pages/Denials";
 import DenialDetail from "./pages/DenialDetail";
 import SuperAdminRoute from "./components/SuperAdminRoute";
 import ErrorLogs from './pages/admin/ErrorLogs';
-import Appeals from "./pages/Appeal";
+import Appeals from "./pages/Appeals";
 
 const queryClient = new QueryClient();
 

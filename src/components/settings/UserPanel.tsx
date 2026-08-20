@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth, useCan } from "../../contexts/AuthContext";
 import { inviteUser, listUsers, removeUser, updateUserRole, type ClinicUser, type InviteUserInput } from "../../lib/users";
 import { useState } from "react";
 import { Button } from "../ui/Button";
@@ -11,6 +11,7 @@ const emptyForm: InviteUserInput = { name: '', email: '', role: 'biller' };
 
 export function UsersPanel() {
     const queryClient = useQueryClient();
+    const can = useCan();
     const { user: currentUser } = useAuth();
     const { data: users, isLoading } = useQuery({ queryKey: ['users'], queryFn: listUsers });
 
@@ -31,18 +32,26 @@ export function UsersPanel() {
     const roleMutation = useMutation({
         mutationFn: ({ id, role }: { id: number; role: ClinicUser['role'] }) => updateUserRole(id, role),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+        onError: (error) => {
+            const msg = (error as { response?: { data?: {message?: string } } }).response?.data?.message;
+            alert(msg ?? 'Não foi possível concluir a operação.');
+        },
     });
 
     const removeMutation = useMutation({
         mutationFn: removeUser,
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+        onError: (error) => {
+            const msg = (error as { response?: { data?: {message?: string } } }).response?.data?.message;
+            alert(msg ?? 'Não foi possível concluir a operação.');
+        },
     });
 
     return (
         <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
                 <h3 className="font-sans text-base font-semibold text-text-secondary">Usuários</h3>
-                <Button size="sm" onClick={() => setShowForm(true)}>+ Convidar</Button>
+                {can.manage_users && <Button size="sm" onClick={() => setShowForm(true)}>+ Convidar</Button>}
             </div>
 
             {invitedPassword && (
@@ -102,7 +111,7 @@ export function UsersPanel() {
                         <div className="flex items-center gap-2">
                             <select
                                 value={u.role}
-                                disabled={u.id === currentUser?.id}
+                                disabled={!can.manage_users || u.id === currentUser?.id}
                                 onChange={(e) => roleMutation.mutate({ id: u.id, role: e.target.value as ClinicUser['role'] })}
                                 className="h-8 rounded-md border border-border px-2 text-sm"
                             >
@@ -111,7 +120,7 @@ export function UsersPanel() {
                                 ))}
                             </select>
 
-                            {u.id !== currentUser?.id && (
+                            {can.manage_users && u.id !== currentUser?.id && (
                                 <Button size="xs" variant="danger" onClick={() => removeMutation.mutate(u.id)}>Remover</Button>
                             )}
                         </div>

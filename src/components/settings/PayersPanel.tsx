@@ -4,11 +4,13 @@ import { useState } from "react";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { Input } from "../ui/Input";
+import { useCan } from "../../contexts/AuthContext";
 
 const emptyForm: PayerInput = { name: '', ans_registry_code: '', integration_type: 'manual' };
 
 export function PayersPanel() {
     const queryClient = useQueryClient();
+    const can = useCan();
     const { data: payers, isLoading } = useQuery({ queryKey: ['payers'], queryFn: listPayers });
 
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -75,7 +77,7 @@ export function PayersPanel() {
                     <p className="font-sans text-sm text-text-muted">Operadoras vinculadas à sua clínica</p>
                 </div>
 
-                <Button size="sm" onClick={openCreateForm}>Novo convênio</Button>
+                {can.operate && <Button size="sm" onClick={openCreateForm}>Novo convênio</Button>}
             </div>
 
             {showForm && (
@@ -142,8 +144,12 @@ export function PayersPanel() {
                                     <td className="px-4 py-2.5">{payer.ans_registry_code || '-'}</td>
                                     <td className="px-4 py-2.5">{payer.integration_type === 'manual' ? 'Manual' : 'Webservice TISS'}</td>
                                     <td className="px-4 py-2.5 text-right">
-                                        <Button size="xs" variant="ghost" onClick={() => openEditForm(payer)}>Editar</Button>{' '}
-                                        <Button size="xs" variant="danger" onClick={() => deleteMutation.mutate(payer.id)}>Excluir</Button>
+                                        {can.operate && (
+                                            <>
+                                                <Button size="xs" variant="ghost" onClick={() => openEditForm(payer)}>Editar</Button>{' '}
+                                                <Button size="xs" variant="danger" onClick={() => deleteMutation.mutate(payer.id)}>Excluir</Button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

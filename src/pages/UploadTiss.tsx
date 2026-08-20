@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import clsx from "clsx";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
+import { useCan } from "../contexts/AuthContext";
 
 const statusLabel: Record<TissUpload['status'], string> = {
     pending: 'Na fila',
@@ -30,6 +31,7 @@ function formatSize(bytes: number) {
 export default function UploadTiss() {
     const queryClient = useQueryClient();
     const inputRef = useRef<HTMLInputElement>(null);
+    const can = useCan();
     
     const [dragging, setDragging] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -54,6 +56,8 @@ export default function UploadTiss() {
     });
 
     function handleFiles(files: FileList | null) {
+        if (!can.operate) return;
+
         const file = files?.[0];
 
         if (!file) return;
@@ -81,7 +85,7 @@ export default function UploadTiss() {
                     onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
                     onDragLeave={() => setDragging(false)}
                     onDrop={handleDrop}
-                    onClick={() => !uploading && inputRef.current?.click()}
+                    onClick={() => can.operate && !uploading && inputRef.current?.click()}
                     className={clsx(
                         'flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center transition-colors duration-200',
                         dragging ? 'border-brand-500 bg-brand-50' : 'border-border bg-surface'
@@ -113,7 +117,7 @@ export default function UploadTiss() {
 
                             <div className="mb-3.5 text-sm text-text-muted">Padrão TISS · XML até 50 MB</div>
 
-                            <Button variant="secondary">Selecionar arquivos</Button>
+                            <Button variant="secondary">{can.operate ? 'Selecionar arquivos' : 'Sem permissão para enviar'}</Button>
                         </div>
                     )}
                 </div>

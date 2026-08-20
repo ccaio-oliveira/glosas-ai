@@ -8,6 +8,7 @@ import { CalendarClock, Clock, FileCheck2, TrendingUp } from "lucide-react";
 import { formatBRL } from "../lib/denials";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
+import { useCan } from "../contexts/AuthContext";
 
 const selectClass = 'h-9 rounded-md border-[1.5px] border-border bg-white px-2.5 text-sm text-text-secondary outline-none';
 const STATUSES: AppealStatus[] = ['draft', 'submitted', 'under_review', 'accepted', 'rejected'];
@@ -15,6 +16,8 @@ const STATUSES: AppealStatus[] = ['draft', 'submitted', 'under_review', 'accepte
 export default function Appeals() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const can = useCan();
+
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
 
@@ -128,6 +131,7 @@ export default function Appeals() {
                                         <td className="px-3.5 py-2.5">
                                             <select
                                                 value={a.status}
+                                                disabled={!can.operate}
                                                 onChange={(e) => statusMutation.mutate({ id: a.id, status: e.target.value as AppealStatus })}
                                                 className="h-7 rounded-md border border-border bg-white px-1.5 text-xs"
                                             >

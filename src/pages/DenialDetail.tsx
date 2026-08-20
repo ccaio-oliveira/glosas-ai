@@ -7,6 +7,7 @@ import { AppLayout } from "../components/layout/AppLayout";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { AppealStatusBadge } from "../components/data/AppealStatusBadge";
+import { useCan } from "../contexts/AuthContext";
 
 function Field({ label, value, mono, highlight }: { label: string; value: string; mono?: boolean; highlight?: boolean }) {
     return (
@@ -30,6 +31,7 @@ export default function DenialDetail() {
     const denialId = Number(id);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const can = useCan();
 
     const { data: denial, isLoading } = useQuery({
         queryKey: ['denial', denialId],
@@ -85,6 +87,7 @@ export default function DenialDetail() {
                 <>
                     <select
                         value={denial.status}
+                        disabled={!can.operate}
                         onChange={(e) => statusMutation.mutate(e.target.value as DenialStatus)}
                         className="h-8 rounded-md border border-border px-2 text-sm"
                     >
@@ -149,7 +152,7 @@ export default function DenialDetail() {
                                 </span>
                             </div>
 
-                            <Button size="xs" variant="accent" onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending}>
+                            <Button size="xs" variant="accent" onClick={() => generateMutation.mutate()} disabled={!can.operate || generateMutation.isPending}>
                                 {generateMutation.isPending ? 'Gerando...' : 'Gerar recurso'}
                             </Button>
                         </div>
@@ -182,6 +185,7 @@ export default function DenialDetail() {
                         <textarea
                             value={text}
                             onChange={(e) => setText(e.target.value)}
+                            readOnly={!can.operate}
                             placeholder="Escreva o texto do recurso de defesa..."
                             className="h-64 w-full resize-y rounded-md border-[1.5px] border-border p-2.5 font-mono text-xs leading-relaxed outline-none" 
                         />
@@ -202,7 +206,7 @@ export default function DenialDetail() {
                             size="sm"
                             fullWidth
                             onClick={() => saveMutation.mutate()}
-                            disabled={!text.trim() || !isDirty || saveMutation.isPending}
+                            disabled={!can.operate || !text.trim() || !isDirty || saveMutation.isPending}
                         >
                             {isDirty ? 'Salvar' : 'Salvo'}
                         </Button>
@@ -212,7 +216,7 @@ export default function DenialDetail() {
                             variant="ghost"
                             fullWidth
                             onClick={() => pdfMutation.mutate()}
-                            disabled={!savedText || pdfMutation.isPending}
+                            disabled={!can.operate || !savedText || pdfMutation.isPending}
                         >
                             {pdfMutation.isPending ? 'Gerando...' : 'PDF'}
                         </Button>

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getClinic, updateClinicPlan, type Clinic } from "../../lib/clinic";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
+import { useCan } from "../../contexts/AuthContext";
 
 const PLANS: { id: Clinic['current_plan']; label: string; price: string }[] = [
     { id: 'starter', label: 'Starter', price: 'R$ 299' },
@@ -11,6 +12,7 @@ const PLANS: { id: Clinic['current_plan']; label: string; price: string }[] = [
 
 export function BillingPanel() {
     const queryClient = useQueryClient();
+    const can = useCan();
     const { data: clinic } = useQuery({ queryKey: ['clinic'], queryFn: getClinic });
 
     const planMutation = useMutation({
@@ -45,7 +47,7 @@ export function BillingPanel() {
                                 <Button
                                     size="sm"
                                     variant={isCurrent ? 'secondary' : 'ghost' }
-                                    disabled={isCurrent || planMutation.isPending}
+                                    disabled={isCurrent || !can.manage_billing || planMutation.isPending}
                                     onClick={() => planMutation.mutate(plan.id)}
                                     fullWidth
                                     className="mt-3"
