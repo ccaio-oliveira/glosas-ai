@@ -8,6 +8,7 @@ import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { AppealStatusBadge } from "../components/data/AppealStatusBadge";
 import { useCan } from "../contexts/AuthContext";
+import { AuditTimeline } from "../components/data/AuditTimeline";
 
 function Field({ label, value, mono, highlight }: { label: string; value: string; mono?: boolean; highlight?: boolean }) {
     return (
@@ -50,6 +51,7 @@ export default function DenialDetail() {
         queryClient.invalidateQueries({ queryKey: ['denial', denialId] });
         queryClient.invalidateQueries({ queryKey: ['denials'] });
         queryClient.invalidateQueries({ queryKey: ['denial-summary'] });
+        queryClient.invalidateQueries({ queryKey: ['denial-audit', denialId] });
     };
 
     const saveMutation = useMutation({ mutationFn: () => saveAppeal(denialId, text), onSuccess: invalidate });
@@ -99,43 +101,54 @@ export default function DenialDetail() {
             }
         >
             <div className="grid grid-cols-[1fr_380px] items-start gap-5">
-                <Card
-                    padding="20px"
-                    header={
-                        <>
-                            <span className="font-semibold text-text-primary">Informações da glosa</span>
-                            <StatusBadge status={denial.status} />
-                        </>
-                    }
-                >
-                    <div className="grid grid-cols-2 gap-4">
-                        <Field label="Nº da guia" value={denial.claim_number ?? '-'} mono />
-                        <Field label="Paciente" value={denial.patient_name ?? '-'} />
-                        <Field label="Procedimento" value={denial.procedure_description ?? '-'} />
-                        <Field label="Código TUSS" value={denial.procedure_code ?? '-'} mono />
-                        <Field label="Convênio" value={denial.payer_name ?? '-'} />
-                        <Field label="Tipo de glosa" value={categoryLabel[denial.category]} />
-                        <Field label="Valor cobrado" value={formatBRL(denial.billed_amount)} />
-                        <Field label="Valor glosado" value={formatBRL(denial.amount)} highlight />
+                <div className="flex flex-col gap-5">
+                    <Card
+                        padding="20px"
+                        header={
+                            <>
+                                <span className="font-semibold text-text-primary">Informações da glosa</span>
+                                <StatusBadge status={denial.status} />
+                            </>
+                        }
+                    >
+                        <div className="grid grid-cols-2 gap-4">
+                            <Field label="Nº da guia" value={denial.claim_number ?? '-'} mono />
+                            <Field label="Paciente" value={denial.patient_name ?? '-'} />
+                            <Field label="Procedimento" value={denial.procedure_description ?? '-'} />
+                            <Field label="Código TUSS" value={denial.procedure_code ?? '-'} mono />
+                            <Field label="Convênio" value={denial.payer_name ?? '-'} />
+                            <Field label="Tipo de glosa" value={categoryLabel[denial.category]} />
+                            <Field label="Valor cobrado" value={formatBRL(denial.billed_amount)} />
+                            <Field label="Valor glosado" value={formatBRL(denial.amount)} highlight />
 
-                        <div className="col-span-2">
-                            <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-                                Motivo da glosa
+                            <div className="col-span-2">
+                                <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                                    Motivo da glosa
+                                </div>
+
+                                <div className="rounded-md border-1-[3px] border-danger-500 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+                                    {denial.reason_code && <span className="mr-2 font-mono font-semibold">{denial.reason_code}</span>}
+                                    {denial.reason_description ?? 'Não informado'}
+                                </div>
+
+                                {denial.needs_ai_review && (
+                                    <p className="mt-2 text-xs text-warning-600">
+                                        Código não catalogado na Tabela 38 - precisa de análise antes de contestar.
+                                    </p>
+                                )}
                             </div>
-
-                            <div className="rounded-md border-1-[3px] border-danger-500 bg-danger-50 px-3 py-2 text-sm text-danger-600">
-                                {denial.reason_code && <span className="mr-2 font-mono font-semibold">{denial.reason_code}</span>}
-                                {denial.reason_description ?? 'Não informado'}
-                            </div>
-
-                            {denial.needs_ai_review && (
-                                <p className="mt-2 text-xs text-warning-600">
-                                    Código não catalogado na Tabela 38 - precisa de análise antes de contestar.
-                                </p>
-                            )}
                         </div>
-                    </div>
-                </Card>
+                    </Card>
+
+                    <Card 
+                        padding="20px" 
+                        header={
+                            <span className="font-semibold text-text-primary">Histórico</span>
+                        }
+                    >
+                        <AuditTimeline denialId={denialId} />
+                    </Card>
+                </div>
 
                 <Card padding="0" style={{ position: 'sticky', top: 0 }}>
                     <div className="border-b border-border bg-gradient-to-br from-accent-50 to-brand-50 px-4 py-3.5">

@@ -53,6 +53,15 @@ export interface GenerateAppealResult {
     missing_legal_basis: boolean;
 }
 
+export interface AuditEntry {
+    id: number;
+    action: string;
+    user_name: string;
+    summary: string;
+    changes: Record<string, unknown> | null;
+    created_at: string;
+}
+
 export const categoryLabel: Record<DenialCategory, string> = {
     administrative: 'Administrativa',
     technical: 'Técnica',
@@ -117,6 +126,11 @@ export async function downloadAppealPdf(denialId: number) {
     link.download = filename;
     link.click();
     URL.revokeObjectURL(url);
+}
+
+export async function getDenialAudit(denialId: number) {
+    const res = await api.get<AuditEntry[]>(`/api/denials/${denialId}/audit`);
+    return res.data;
 }
 
 export function formatBRL(value: number) {
