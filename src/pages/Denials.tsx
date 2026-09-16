@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { categoryLabel, formatBRL, listDenials, type DenialCategory } from "../lib/denials";
+import { categoryLabel, formatBRL, formatDate, listDenials, type DenialCategory } from "../lib/denials";
 import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { useQuery } from "@tanstack/react-query";
@@ -21,10 +21,12 @@ export default function Denials() {
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
     const [category, setCategory] = useState('');
+    const [from, setFrom] = useState('');
+    const [to, setTo] = useState('');
 
     const { data: denials, isLoading } = useQuery({
-        queryKey: ['denials', { search, status, category }],
-        queryFn: () => listDenials({ search, status, category }),
+        queryKey: ['denials', { search, status, category, from, to }],
+        queryFn: () => listDenials({ search, status, category, from, to }),
     });
 
     const total = (denials ?? []).reduce((sum, d) => sum + d.amount, 0);
@@ -61,6 +63,25 @@ export default function Denials() {
                     <span className="text-xs text-text-muted">{denials?.length ?? 0} resultado(s)</span>
                 </div>
 
+                <div className="flex flex-wrap items-center gap-2.5 border-b border-border px-3.5 pb-3.5">
+                    <span className="text-sm text-text-secondary">Atendimento de</span>
+
+                    <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className={selectClass} />
+
+                    <span className="text-sm text-text-muted">até</span>
+
+                    <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={selectClass} />
+
+                    {(from || to) && (
+                        <button
+                            onClick={() => { setFrom(''); setTo(''); }}
+                            className="text-xs text-brand-600 hover:underline"
+                        >
+                            Limpar datas
+                        </button>
+                    )}
+                </div>
+
                 {isLoading && <p className="p-5 text-text-muted">Carregando...</p>}
 
                 {!isLoading && !denials?.length && (
@@ -72,7 +93,7 @@ export default function Denials() {
                         <table className="w-full border-collapse">
                             <thead>
                                 <tr className="bg-neutral-50">
-                                    {['Nº Guia', 'Paciente', 'Procedimento', 'Convênio', 'Tipo', 'Data', 'Valor', 'Status'].map((h) => (
+                                    {['Nº Guia', 'Paciente', 'Procedimento', 'Convênio', 'Tipo', 'Atendimento', 'Valor', 'Status'].map((h) => (
                                         <th
                                             key={h}
                                             className={clsx(
@@ -102,9 +123,9 @@ export default function Denials() {
                                             </span>
                                         </td>
                                         <td className="whitespace-nowrap px-3.5 py-2.5 text-xs text-text-muted">
-                                            {denial.identified_at ? new Date(denial.identified_at + 'T00:00:00').toLocaleDateString('pt-BR') : '-'}
+                                            {formatDate(denial.service_date)}
                                         </td>
-                                        <td className="whitespace-nowrap px-3.5 py-2.5 text-right text-sm font-semibold text-text-primary">
+                                        <td className="whitespace-nowrap px-3.5 py-2.5 text-right text-sm font-semibold tabular-nums text-text-primary">
                                             {formatBRL(denial.amount)}
                                         </td>
                                         <td className="px-3.5 py-2.5">

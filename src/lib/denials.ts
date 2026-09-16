@@ -8,6 +8,7 @@ export interface Denial {
     claim_number: string | null;
     patient_name: string | null;
     payer_name: string | null;
+    service_date: string | null;
     procedure_code: string | null;
     procedure_description: string | null;
     billed_amount: number;
@@ -77,7 +78,21 @@ export const sourceLabel: Record<string, string> = {
     manual: 'Escrito manualmente',
 };
 
-export async function listDenials(filters: { search?: string; status?: string; category?: string }) {
+export interface DenialFilters {
+    search?: string;
+    status?: string;
+    category?: string;
+    /** Recorte pela data do atendimento, não pela do upload. */
+    from?: string;
+    to?: string;
+}
+
+/** dd/mm/aaaa a partir de um AAAA-MM-DD, sem deslocar por fuso. */
+export function formatDate(date: string | null | undefined) {
+    return date ? new Date(date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+}
+
+export async function listDenials(filters: DenialFilters) {
     const res = await api.get<Denial[]>('/api/denials', { params: filters });
     return res.data;
 }

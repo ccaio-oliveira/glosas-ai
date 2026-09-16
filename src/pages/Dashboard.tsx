@@ -8,7 +8,9 @@ import { formatBRL, getDenialSummary } from "../lib/denials";
 
 export default function Dashboard() {
     const { user } = useAuth();
-    const { data: claims } = useQuery({ queryKey: ['claims'], queryFn: listClaims });
+    // Envolvido numa arrow de propósito: passar listClaims direto faria o React Query
+    // entregar o próprio contexto como filtros, e o axios o serializaria em query params.
+    const { data: claims } = useQuery({ queryKey: ['claims'], queryFn: () => listClaims() });
     const { data: payers } = useQuery({ queryKey: ['payers'], queryFn: listPayers });
     const { data: summary } = useQuery({ queryKey: ['denial-summary'], queryFn: getDenialSummary });
 

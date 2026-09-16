@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClaim, deleteClaim, listClaims, updateClaim, type Claim, type ClaimInput } from "../lib/claims";
+import { formatDate } from "../lib/denials";
+import { useCan } from "../contexts/AuthContext";
 import { listPayers } from "../lib/payers";
 import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
@@ -8,7 +10,7 @@ import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { Link } from "react-router-dom";
 
-const emptyForm: ClaimInput = { payer_id: '', claim_number: '', patient_name: '', total_amount: '' };
+const emptyForm: ClaimInput = { payer_id: '', claim_number: '', patient_name: '', service_date: '', total_amount: '' };
 
 const statusLabel: Record<Claim['status'], string> = {
     processing: 'Processando',
@@ -24,7 +26,16 @@ const statusColor: Record<Claim['status'], string> = {
 
 export default function Claims() {
     const queryClient = useQueryClient();
-    const { data: claims, isLoading } = useQuery({ queryKey: ['claims'], queryFn: listClaims });
+    const can = useCan();
+
+    const [search, setSearch] = useState('');
+    const [from, setFrom] = useState('');
+    const [to, setTo] = useState('');
+
+    const { data: claims, isLoading } = useQuery({
+        queryKey: ['claims', { search, from, to }],
+        queryFn: () => listClaims({ search, from, to }),
+    });
     const { data: payers } = useQuery({ queryKey: ['payers'], queryFn: listPayers });
 
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -64,6 +75,7 @@ export default function Claims() {
             payer_id: claim.payer_id,
             claim_number: claim.claim_number,
             patient_name: claim.patient_name,
+            service_date: claim.service_date ?? '',
             total_amount: claim.total_amount,
         });
         setShowForm(true);
@@ -92,7 +104,7 @@ export default function Claims() {
             actions={
                 <>
                     <Link to="/payers" className="text-sm text-brand-600 hover:underline">Gerenciar convênios</Link>
-                    <Button size="sm" onClick={openCreateForm}>Nova Guia</Button>
+                    {can.operate && <Button size="sm" onClick={openCreateForm}>Nova Guia</Button>}
                 </>
             }
         >
@@ -131,6 +143,14 @@ export default function Claims() {
                         />
 
                         <Input
+                            label="Data do atendimento"
+                            type="date"
+                            max={new Date().toISOString().slice(0, 10)}
+                            value={form.service_date}
+                            onChange={(e) => setForm({ ...form, service_date: e.target.value })}
+                        />
+
+                        <Input
                             label="Valor total (R$)"
                             required
                             type="number"
@@ -158,15 +178,47 @@ export default function Claims() {
             )}
 
             <Card padding="0">
+                <div className="flex flex-wrap items-center gap-2.5 border-b border-border p-3.5">
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Buscar por paciente ou nº da guia..."
+                        className="h-9 min-w-[220px] flex-1 rounded-md border-[1.5px] border-border px-3 text-sm outline-none"
+                    />
+
+                    <span className="text-sm text-text-secondary">Atendimento de</span>
+
+                    <input type="date" value={from} onChange={(e) => setFrom(e.target.value)}
+                        className="h-9 rounded-md border-[1.5px] border-border bg-white px-2.5 text-sm text-text-secondary outline-none" />
+
+                    <span className="text-sm text-text-muted">até</span>
+
+                    <input type="date" value={to} onChange={(e) => setTo(e.target.value)}
+                        className="h-9 rounded-md border-[1.5px] border-border bg-white px-2.5 text-sm text-text-secondary outline-none" />
+
+                    {(search || from || to) && (
+                        <button onClick={() => { setSearch(''); setFrom(''); setTo(''); }}
+                            className="text-xs text-brand-600 hover:underline">
+                            Limpar
+                        </button>
+                    )}
+
+                    <span className="text-xs text-text-muted">{claims?.length ?? 0} guia(s)</span>
+                </div>
+
                 {isLoading && <p style={{ padding: 20 }}>Carregando...</p>}
 
-                {!isLoading && claims?.length === 0 && <p style={{ padding: 20 }}>Nenhuma guia cadastrada ainda.</p>}
+                {!isLoading && claims?.length === 0 && (
+                    <p style={{ padding: 20 }}>
+                        {search || from || to ? 'Nenhuma guia encontrada com esses filtros.' : 'Nenhuma guia cadastrada ainda.'}
+                    </p>
+                )}
 
                 {!isLoading && claims && claims.length > 0 && (
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
                             <tr style={{ background: 'var(--color-neutral-50)' }}>
-                                {['Nº Guia', 'Paciente', 'Convênio', 'Valor', 'Status', ''].map((h) => (
+                                {['Nº Guia', 'Paciente', 'Convênio', 'Atendimento', 'Valor', 'Status', ''].map((h) => (
                                     <th key={h} style={{ padding: '9px 16px', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-muted)', textAlign: h === 'Valor' ? 'right' : 'left', textTransform: 'uppercase', borderBottom: '1px solid var(--color-border)' }}>
                                         {h}
                                     </th>
@@ -180,7 +232,10 @@ export default function Claims() {
                                     <td style={{ padding: '10px 16px' }}>{claim.claim_number}</td>
                                     <td style={{ padding: '10px 16px' }}>{claim.patient_name}</td>
                                     <td style={{ padding: '10px 16px' }}>{claim.payer?.name ?? '-'}</td>
-                                    <td style={{ padding: '10px 16px', textAlign: 'right' }}>
+                                    <td style={{ padding: '10px 16px', fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+                                        {formatDate(claim.service_date)}
+                                    </td>
+                                    <td style={{ padding: '10px 16px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
                                         {Number(claim.total_amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                     </td>
                                     <td style={{ padding: '10px 16px' }}>
@@ -190,8 +245,12 @@ export default function Claims() {
                                         </span>
                                     </td>
                                     <td style={{ padding: '10px 16px', textAlign: 'right' }}>
-                                        <Button size="xs" variant="ghost" onClick={() => openEditForm(claim)}>Editar</Button>{''}
-                                        <Button size="xs" variant="danger" onClick={() => deleteMutation.mutate(claim.id)}>Excluir</Button>
+                                        {can.operate && (
+                                            <>
+                                                <Button size="xs" variant="ghost" onClick={() => openEditForm(claim)}>Editar</Button>{' '}
+                                                <Button size="xs" variant="danger" onClick={() => deleteMutation.mutate(claim.id)}>Excluir</Button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

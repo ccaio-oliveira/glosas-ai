@@ -7,6 +7,8 @@ export interface Claim {
     payer?: { id: number; name: string; ans_registry_code: string | null };
     claim_number: string;
     patient_name: string;
+    /** Data do atendimento, vinda do XML. Null em guia lançada à mão sem preencher. */
+    service_date: string | null;
     total_amount: string;
     status: "processing" | "processed" | "error";
     created_at: string;
@@ -17,11 +19,18 @@ export interface ClaimInput {
     payer_id: number | '';
     claim_number: string;
     patient_name: string;
+    service_date: string;
     total_amount: string;
 }
 
-export async function listClaims() {
-    const res = await api.get<Claim[]>('/api/claims');
+export interface ClaimFilters {
+    search?: string;
+    from?: string;
+    to?: string;
+}
+
+export async function listClaims(filters: ClaimFilters = {}) {
+    const res = await api.get<Claim[]>('/api/claims', { params: filters });
     return res.data;
 }
 

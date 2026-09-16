@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus } from "../lib/denials";
+import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate } from "../lib/denials";
 import { useEffect, useState } from "react";
 import { STATUS_OPTIONS, StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
 import { AppLayout } from "../components/layout/AppLayout";
@@ -84,7 +84,7 @@ export default function DenialDetail() {
     return (
         <AppLayout
             title={`Glosa #${denial.id}`}
-            subtitle={[denial.patient_name, denial.payer_name, denial.identified_at ? new Date(denial.identified_at + 'T00:00:00').toLocaleDateString('pt-BR') : null].filter(Boolean).join(' · ')}
+            subtitle={[denial.patient_name, denial.payer_name, denial.service_date ? `Atendimento em ${formatDate(denial.service_date)}` : null].filter(Boolean).join(' · ')}
             actions={
                 <>
                     <select
@@ -120,6 +120,8 @@ export default function DenialDetail() {
                             <Field label="Tipo de glosa" value={categoryLabel[denial.category]} />
                             <Field label="Valor cobrado" value={formatBRL(denial.billed_amount)} />
                             <Field label="Valor glosado" value={formatBRL(denial.amount)} highlight />
+                            <Field label="Data do atendimento" value={formatDate(denial.service_date)} />
+                            <Field label="Glosa identificada em" value={formatDate(denial.identified_at)} />
 
                             <div className="col-span-2">
                                 <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted">
