@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import clsx from "clsx";
-import { PayersPanel } from "../components/settings/PayersPanel";
 import { ClinicPanel } from "../components/settings/ClinicPanel";
 import { BillingPanel } from "../components/settings/BillingPanel";
 import { UsersPanel } from "../components/settings/UserPanel";
