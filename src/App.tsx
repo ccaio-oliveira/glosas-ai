@@ -13,6 +13,7 @@ import DenialDetail from "./pages/DenialDetail";
 import SuperAdminRoute from "./components/SuperAdminRoute";
 import ErrorLogs from './pages/admin/ErrorLogs';
 import Appeals from "./pages/Appeals";
+import Reports from "./pages/Reports";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,11 @@ export default function App() {
             <Route path="/appeals" element={
               <ProtectedRoute>
                 <Appeals />
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Reports />
               </ProtectedRoute>
             } />
             <Route path="/admin/errors" element={
