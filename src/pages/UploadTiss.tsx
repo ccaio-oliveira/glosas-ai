@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { listTissUploads, uploadTissFile, type TissUpload } from "../lib/tissUploads";
-import { useRef, useState } from "react";
+import {
+    DuplicateUploadError, listTissUploads, uploadTissFile,
+    type DuplicateInfo, type TissUpload,
+} from "../lib/tissUploads";
+import { useRef, useState, type DragEvent } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
@@ -36,6 +39,7 @@ export default function UploadTiss() {
     const [dragging, setDragging] = useState(false);
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState<string | null>(null);
+    const [duplicate, setDuplicate] = useState<{ info: DuplicateInfo; file: File } | null>(null);
 
     const { data: uploads } = useQuery({
         queryKey: ['tiss-uploads'],
@@ -44,14 +48,24 @@ export default function UploadTiss() {
     });
 
     const uploadMutation = useMutation({
-        mutationFn: (file: File) => uploadTissFile(file, setProgress),
+        mutationFn: ({ file, force }: { file: File; force?: boolean }) =>
+            uploadTissFile(file, { force, onProgress: setProgress }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tiss-uploads'] });
             setProgress(0);
+            setDuplicate(null);
         },
-        onError: () => {
-            setError('Não foi possível enviar o arquivo. Verifique se é um XML TISS válido (até 50 MB).');
+        onError: (err, variables) => {
             setProgress(0);
+
+            // 409 não é falha de envio: é o arquivo já processado antes. Cai num
+            // aviso com contexto, não na mensagem genérica.
+            if (err instanceof DuplicateUploadError) {
+                setDuplicate({ info: err.duplicate, file: variables.file });
+                return;
+            }
+
+            setError('Não foi possível enviar o arquivo. Verifique se é um XML TISS válido (até 50 MB).');
         }
     });
 
@@ -63,10 +77,11 @@ export default function UploadTiss() {
         if (!file) return;
 
         setError(null);
-        uploadMutation.mutate(file);
+        setDuplicate(null);
+        uploadMutation.mutate({ file });
     }
 
-    function handleDrop(e: DragEvent) {
+    function handleDrop(e: DragEvent<HTMLDivElement>) {
         e.preventDefault();
         setDragging(false);
         handleFiles(e.dataTransfer.files);
@@ -123,6 +138,42 @@ export default function UploadTiss() {
                 </div>
 
                 {error && <p className="text-sm text-danger-600">{error}</p>}
+
+                {duplicate && (
+                    <Card style={{ borderColor: 'var(--color-warning-500)' }}>
+                        <div className="flex flex-col gap-2">
+                            <div className="text-sm font-semibold text-warning-600">
+                                Este arquivo já foi processado
+                            </div>
+
+                            <div className="text-sm text-text-secondary">
+                                <span className="font-mono">{duplicate.info.original_filename}</span> foi processado
+                                em {new Date(duplicate.info.processed_at).toLocaleString('pt-BR')}, gerando{' '}
+                                {duplicate.info.claims_count} guia(s) e {duplicate.info.denials_count} glosa(s).
+                            </div>
+
+                            <div className="text-xs text-text-muted">
+                                Enviar de novo vai duplicar essas glosas e dobrar o valor no dashboard.
+                                Só force se souber que as anteriores foram removidas.
+                            </div>
+
+                            <div className="mt-1 flex gap-2">
+                                <Button size="sm" variant="ghost" onClick={() => setDuplicate(null)}>
+                                    Cancelar
+                                </Button>
+
+                                <Button
+                                    size="sm"
+                                    variant="danger"
+                                    disabled={uploading}
+                                    onClick={() => uploadMutation.mutate({ file: duplicate.file, force: true })}
+                                >
+                                    Enviar mesmo assim
+                                </Button>
+                            </div>
+                        </div>
+                    </Card>
+                )}
 
                 <Card padding="0" header={<span className="font-semibold text-text-primary">Arquivos importados</span>}>
                     {!uploads?.length && <p className="p-5 text-text-muted">Nenhum arquivo importado ainda</p>}
