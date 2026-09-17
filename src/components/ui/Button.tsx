@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import clsx from "clsx";
+import { cn } from "../../lib/cn";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 const button = cva(
@@ -47,7 +47,7 @@ export function Button({
     ...rest
 }: ButtonProps) {
     return (
-        <button className={clsx(button({ variant, size, fullWidth }), className)} {...rest}>
+        <button className={cn(button({ variant, size, fullWidth }), className)} {...rest}>
             {leftIcon && <span className="flex items-center">{leftIcon}</span>}
             {children}
             {rightIcon && <span className="flex items-center">{rightIcon}</span>}

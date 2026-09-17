@@ -140,7 +140,7 @@ export default function UploadTiss() {
                 {error && <p className="text-sm text-danger-600">{error}</p>}
 
                 {duplicate && (
-                    <Card style={{ borderColor: 'var(--color-warning-500)' }}>
+                    <Card className="border-warning-500">
                         <div className="flex flex-col gap-2">
                             <div className="text-sm font-semibold text-warning-600">
                                 Este arquivo já foi processado

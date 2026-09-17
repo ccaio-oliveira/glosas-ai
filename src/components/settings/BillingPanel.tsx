@@ -24,7 +24,7 @@ export function BillingPanel() {
 
     return (
         <div className="flex flex-col gap-4">
-            <Card className="text-white" style={{ background: 'var(--color-brand-700)' }}>
+            <Card className="bg-brand-700 text-white">
                 <div className="text-xs font-medium uppercase text-white/60">Plano atual</div>
                 <div className="mt-1 text-2xl font-bold">{current?.label ?? '-'}</div>
                 <div className="mt-1 text-3xl font-extrabold">

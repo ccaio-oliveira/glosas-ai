@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "../../lib/cn";
 import type { CSSProperties, ReactNode } from "react";
 
 interface CardProps {
@@ -21,7 +21,7 @@ export function Card({
     const p = padding ?? 'var(--card-padding)';
 
     return (
-        <div className={clsx('overflow-hidden rounded-lg border border-border bg-surface shadow-sm', className)} style={style}>
+        <div className={cn('overflow-hidden rounded-lg border border-border bg-surface shadow-sm', className)} style={style}>
             {header && (
                 <div className="flex items-center justify-between border-b border-border" style={{ padding: `14px ${p}` }}>
                     {header}

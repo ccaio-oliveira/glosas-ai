@@ -152,7 +152,7 @@ export default function DenialDetail() {
                     </Card>
                 </div>
 
-                <Card padding="0" style={{ position: 'sticky', top: 0 }}>
+                <Card padding="0" className="sticky top-0">
                     <div className="border-b border-border bg-gradient-to-br from-accent-50 to-brand-50 px-4 py-3.5">
                         <span className="text-sm font-semibold text-text-primary">Recurso de defesa</span>
                     </div>

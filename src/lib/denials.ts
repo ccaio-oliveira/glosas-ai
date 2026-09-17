@@ -87,9 +87,22 @@ export interface DenialFilters {
     to?: string;
 }
 
-/** dd/mm/aaaa a partir de um AAAA-MM-DD, sem deslocar por fuso. */
+/**
+ * dd/mm/aaaa sem deslocar por fuso.
+ *
+ * Aceita tanto `2026-07-14` (o que os controllers com `toDateString()` devolvem)
+ * quanto `2026-07-14T00:00:00.000000Z` (o que o cast `date` do Laravel serializa
+ * quando o model vai direto pro JSON). Concatenar 'T00:00:00' no segundo formato
+ * gerava "Invalid Date" — os dois convivem na API, então o helper trata os dois.
+ */
 export function formatDate(date: string | null | undefined) {
-    return date ? new Date(date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    if (!date) return '—';
+
+    const day = date.slice(0, 10);
+
+    return /^\d{4}-\d{2}-\d{2}$/.test(day)
+        ? new Date(`${day}T00:00:00`).toLocaleDateString('pt-BR')
+        : '—';
 }
 
 export async function listDenials(filters: DenialFilters) {

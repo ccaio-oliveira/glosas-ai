@@ -55,7 +55,7 @@ export function UsersPanel() {
             </div>
 
             {invitedPassword && (
-                <Card style={{ background: 'var(--color-warning-50)' }}>
+                <Card className="bg-warning-50">
                     <p className="text-sm text-text-primary">
                         Usuário criado. Senha temporária (compartilhe com a pessoa, ela deve trocar no primeiro acesso):
                     </p>
