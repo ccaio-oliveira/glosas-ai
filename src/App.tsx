@@ -14,6 +14,7 @@ import SuperAdminRoute from "./components/SuperAdminRoute";
 import ErrorLogs from './pages/admin/ErrorLogs';
 import Appeals from "./pages/Appeals";
 import Reports from "./pages/Reports";
+import Preventive from "./pages/Preventive";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,11 @@ export default function App() {
             <Route path="/appeals" element={
               <ProtectedRoute>
                 <Appeals />
+              </ProtectedRoute>
+            } />
+            <Route path="/preventive" element={
+              <ProtectedRoute>
+                <Preventive />
               </ProtectedRoute>
             } />
             <Route path="/reports" element={
