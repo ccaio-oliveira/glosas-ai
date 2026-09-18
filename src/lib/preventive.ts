@@ -1,7 +1,7 @@
 import { api } from './api';
 
 export type FindingSeverity = 'error' | 'warning';
-export type FindingCategory = 'estrutura' | 'aritmetica' | 'duplicidade' | 'historico';
+export type FindingCategory = 'estrutura' | 'aritmetica' | 'duplicidade' | 'historico' | 'tuss';
 
 export interface Finding {
     severity: FindingSeverity;
@@ -34,6 +34,7 @@ export const categoryLabel: Record<FindingCategory, string> = {
     aritmetica: 'Aritmética',
     duplicidade: 'Duplicidade',
     historico: 'Histórico',
+    tuss: 'Tabela 22',
 };
 
 export async function getPreventiveRules() {
