@@ -205,7 +205,7 @@ export default function UploadTiss() {
                                         <td className="px-4 py-3 text-sm">{upload.claims_count}</td>
                                         <td className="px-4 py-3">
                                             {upload.denials_count > 0 ? (
-                                                <span className="rounded-md bg-danger-50 px-2.5 py-0.5 text-sm font-bold text-danger-600">
+                                                <span className="whitespace-nowrap rounded-md bg-danger-50 px-2.5 py-0.5 text-sm font-bold text-danger-600">
                                                     {upload.denials_count} glosas
                                                 </span>
                                             ) : (
