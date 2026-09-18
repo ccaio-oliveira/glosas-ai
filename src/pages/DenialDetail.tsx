@@ -9,6 +9,7 @@ import { Card } from "../components/ui/Card";
 import { AppealStatusBadge } from "../components/data/AppealStatusBadge";
 import { useCan } from "../contexts/AuthContext";
 import { AuditTimeline } from "../components/data/AuditTimeline";
+import { TussCheck } from "../components/data/TussCheck";
 
 function Field({ label, value, mono, highlight }: { label: string; value: string; mono?: boolean; highlight?: boolean }) {
     return (
@@ -124,11 +125,15 @@ export default function DenialDetail() {
                             <Field label="Glosa identificada em" value={formatDate(denial.identified_at)} />
 
                             <div className="col-span-2">
+                                <TussCheck code={denial.procedure_code} tuss={denial.tuss} />
+                            </div>
+
+                            <div className="col-span-2">
                                 <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted">
                                     Motivo da glosa
                                 </div>
 
-                                <div className="rounded-md border-1-[3px] border-danger-500 bg-danger-50 px-3 py-2 text-sm text-danger-600">
+                                <div className="rounded-md border-l-[3px] border-danger-500 bg-danger-50 px-3 py-2 text-sm text-danger-600">
                                     {denial.reason_code && <span className="mr-2 font-mono font-semibold">{denial.reason_code}</span>}
                                     {denial.reason_description ?? 'Não informado'}
                                 </div>

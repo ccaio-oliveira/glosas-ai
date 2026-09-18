@@ -33,8 +33,17 @@ export interface Appeal {
     responded_at: string | null;
 }
 
+/** Comparação do item com a Tabela 22. `null` quando o item não tem código. */
+export interface TussComparison {
+    found: boolean;
+    official_description: string | null;
+    /** `null` quando o código não existe — não há o que comparar. */
+    description_matches: boolean | null;
+}
+
 export interface DenialDetail extends Denial {
     appeal: Appeal | null;
+    tuss: TussComparison | null;
 }
 
 export interface DenialSummary {
