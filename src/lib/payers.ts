@@ -6,12 +6,15 @@ export interface Payer {
     name: string;
     ans_registry_code: string | null;
     integration_type: 'manual' | 'tiss_webservice';
+    /** Prazo contratual para recorrer, em dias. null = não configurado. */
+    appeal_deadline_days: number | null;
 }
 
 export interface PayerInput {
     name: string;
     ans_registry_code?: string;
     integration_type: 'manual' | 'tiss_webservice';
+    appeal_deadline_days: number | '';
 }
 
 export async function listPayers() {

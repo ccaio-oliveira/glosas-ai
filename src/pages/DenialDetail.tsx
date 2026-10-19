@@ -10,6 +10,7 @@ import { AppealStatusBadge } from "../components/data/AppealStatusBadge";
 import { useCan } from "../contexts/AuthContext";
 import { AuditTimeline } from "../components/data/AuditTimeline";
 import { TussCheck } from "../components/data/TussCheck";
+import { DeadlineBadge } from "../components/data/DeadlineBadge";
 
 function Field({ label, value, mono, highlight }: { label: string; value: string; mono?: boolean; highlight?: boolean }) {
     return (
@@ -123,6 +124,14 @@ export default function DenialDetail() {
                             <Field label="Valor glosado" value={formatBRL(denial.amount)} highlight />
                             <Field label="Data do atendimento" value={formatDate(denial.service_date)} />
                             <Field label="Glosa identificada em" value={formatDate(denial.identified_at)} />
+
+                            <div>
+                                <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                                    Prazo para recurso
+                                </div>
+
+                                <DeadlineBadge deadline={denial.deadline} />
+                            </div>
 
                             <div className="col-span-2">
                                 <TussCheck code={denial.procedure_code} tuss={denial.tuss} />

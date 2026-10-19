@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { categoryLabel, formatBRL, formatDate, listDenials, type DenialCategory } from "../lib/denials";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { categoryLabel, formatBRL, formatDate, listDenials, type DenialCategory, type DenialFilters } from "../lib/denials";
+import { DeadlineBadge } from "../components/data/DeadlineBadge";
 import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { useQuery } from "@tanstack/react-query";
@@ -24,9 +25,15 @@ export default function Denials() {
     const [from, setFrom] = useState('');
     const [to, setTo] = useState('');
 
+    // Vem na URL para o Dashboard poder linkar direto para "vencendo".
+    const [params] = useSearchParams();
+    const [deadline, setDeadline] = useState<NonNullable<DenialFilters['deadline']>>(
+        (params.get('deadline') as DenialFilters['deadline']) ?? '',
+    );
+
     const { data: denials, isLoading } = useQuery({
-        queryKey: ['denials', { search, status, category, from, to }],
-        queryFn: () => listDenials({ search, status, category, from, to }),
+        queryKey: ['denials', { search, status, category, from, to, deadline }],
+        queryFn: () => listDenials({ search, status, category, from, to, deadline }),
     });
 
     const total = (denials ?? []).reduce((sum, d) => sum + d.amount, 0);
@@ -58,6 +65,17 @@ export default function Denials() {
                         <option value="technical">Técnica</option>
                         <option value="linear">Linear</option>
                         <option value="unknown">Não classificada</option>
+                    </select>
+
+                    <select
+                        value={deadline}
+                        onChange={(e) => setDeadline(e.target.value as NonNullable<DenialFilters['deadline']>)}
+                        className={selectClass}
+                    >
+                        <option value="">Todos os prazos</option>
+                        <option value="due_soon">Vencendo (7 dias) e vencidas</option>
+                        <option value="overdue">Só vencidas</option>
+                        <option value="not_configured">Sem prazo configurado</option>
                     </select>
 
                     <span className="text-xs text-text-muted">{denials?.length ?? 0} resultado(s)</span>
@@ -93,7 +111,7 @@ export default function Denials() {
                         <table className="w-full border-collapse">
                             <thead>
                                 <tr className="bg-neutral-50">
-                                    {['Nº Guia', 'Paciente', 'Procedimento', 'Convênio', 'Tipo', 'Atendimento', 'Valor', 'Status'].map((h) => (
+                                    {['Nº Guia', 'Paciente', 'Procedimento', 'Convênio', 'Tipo', 'Atendimento', 'Prazo', 'Valor', 'Status'].map((h) => (
                                         <th
                                             key={h}
                                             className={clsx(
@@ -124,6 +142,9 @@ export default function Denials() {
                                         </td>
                                         <td className="whitespace-nowrap px-3.5 py-2.5 text-xs text-text-muted">
                                             {formatDate(denial.service_date)}
+                                        </td>
+                                        <td className="px-3.5 py-2.5">
+                                            <DeadlineBadge deadline={denial.deadline} />
                                         </td>
                                         <td className="whitespace-nowrap px-3.5 py-2.5 text-right text-sm font-semibold tabular-nums text-text-primary">
                                             {formatBRL(denial.amount)}

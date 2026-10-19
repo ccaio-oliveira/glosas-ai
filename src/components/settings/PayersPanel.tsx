@@ -6,7 +6,7 @@ import { Card } from "../ui/Card";
 import { Input } from "../ui/Input";
 import { useCan } from "../../contexts/AuthContext";
 
-const emptyForm: PayerInput = { name: '', ans_registry_code: '', integration_type: 'manual' };
+const emptyForm: PayerInput = { name: '', ans_registry_code: '', integration_type: 'manual', appeal_deadline_days: '' };
 
 export function PayersPanel() {
     const queryClient = useQueryClient();
@@ -29,6 +29,9 @@ export function PayersPanel() {
         mutationFn: ({ id, data }: { id: number; data: PayerInput }) => updatePayer(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['payers'] });
+            queryClient.invalidateQueries({ queryKey: ['denials'] });
+            queryClient.invalidateQueries({ queryKey: ['denial'] });
+            queryClient.invalidateQueries({ queryKey: ['denial-summary'] });
             closeForm();
         },
     });
@@ -50,6 +53,7 @@ export function PayersPanel() {
             name: payer.name,
             ans_registry_code: payer.ans_registry_code ?? '',
             integration_type: payer.integration_type,
+            appeal_deadline_days: payer.appeal_deadline_days ?? '',
         });
         setShowForm(true);
     }
@@ -109,6 +113,27 @@ export function PayersPanel() {
                             </select>
                         </div>
 
+                        <div className="flex flex-col gap-1">
+                            <Input
+                                label="Prazo para recurso (dias)"
+                                type="number"
+                                min="1"
+                                max="365"
+                                placeholder="Não configurado"
+                                value={form.appeal_deadline_days}
+                                onChange={(e) => setForm({
+                                    ...form,
+                                    appeal_deadline_days: e.target.value === '' ? '' : Number(e.target.value),
+                                })}
+                            />
+
+                            <p className="text-xs text-text-muted">
+                                Conforme o contrato da clínica com este convênio. Conta a partir da data em que a
+                                glosa foi identificada. Sem prazo, as glosas deste convênio aparecem como
+                                "prazo não configurado".
+                            </p>
+                        </div>
+
                         <div className="flex gap-2">
                             <Button onClick={handleSubmit} disabled={!form.name || createMutation.isPending || updateMutation.isPending}>
                                 {editingId ? 'Salvar' : 'Criar'}
@@ -129,7 +154,7 @@ export function PayersPanel() {
                     <table className="w-full border-collapse">
                         <thead>
                             <tr className="bg-neutral-50">
-                                {['Nome', 'Registro ANS', 'Integração', ''].map((h) => (
+                                {['Nome', 'Registro ANS', 'Integração', 'Prazo p/ recurso', ''].map((h) => (
                                     <th key={h} className="border-b border-border px-4 py-2.5 text-left text-[11px] font-semibold uppercase text-text-muted">
                                         {h}
                                     </th>
@@ -143,6 +168,11 @@ export function PayersPanel() {
                                     <td className="px-4 py-2.5">{payer.name}</td>
                                     <td className="px-4 py-2.5">{payer.ans_registry_code || '-'}</td>
                                     <td className="px-4 py-2.5">{payer.integration_type === 'manual' ? 'Manual' : 'Webservice TISS'}</td>
+                                    <td className="px-4 py-2.5 tabular-nums">
+                                        {payer.appeal_deadline_days
+                                            ? `${payer.appeal_deadline_days} dias`
+                                            : <span className="text-text-muted">Não configurado</span>}
+                                    </td>
                                     <td className="px-4 py-2.5 text-right">
                                         {can.operate && (
                                             <>

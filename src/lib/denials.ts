@@ -20,6 +20,18 @@ export interface Denial {
     status: DenialStatus;
     needs_ai_review: boolean;
     identified_at: string | null;
+    deadline: AppealDeadline;
+}
+
+export type DeadlineStatus = 'on_track' | 'due_soon' | 'overdue' | 'not_configured' | 'not_applicable';
+
+/** Prazo para recorrer, calculado no backend a partir do contrato do convênio. */
+export interface AppealDeadline {
+    status: DeadlineStatus;
+    due_date: string | null;
+    /** Negativo quando vencido. */
+    days_left: number | null;
+    deadline_days: number | null;
 }
 
 export interface Appeal {
@@ -52,6 +64,9 @@ export interface DenialSummary {
     recovered_amount: number;
     total_amount: number;
     needs_ai_review_count: number;
+    due_soon_count: number;
+    overdue_count: number;
+    deadline_not_configured_count: number;
 }
 
 export interface GenerateAppealResult {
@@ -94,6 +109,8 @@ export interface DenialFilters {
     /** Recorte pela data do atendimento, não pela do upload. */
     from?: string;
     to?: string;
+    /** `due_soon` inclui as vencidas — é a lista do que exige ação agora. */
+    deadline?: '' | 'due_soon' | 'overdue' | 'not_configured';
 }
 
 /**
