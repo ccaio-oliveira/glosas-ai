@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useState, type FormEvent } from "react";
@@ -21,8 +22,14 @@ export default function Login() {
         try {
             const loggedUser = await login(email, password);
             navigate(loggedUser.role === 'super_admin' ? '/admin/errors' : '/dashboard');
-        } catch {
-            setError('E-mail ou senha inválidos.');
+        } catch (err) {
+            if (isAxiosError(err) && err.response?.status === 429) {
+                setError(err.response.data?.message ?? 'Muitas tentativas de login. Aguarde um minuto e tente novamente.');
+            } else if (isAxiosError(err) && err.response?.status === 422) {
+                setError('E-mail ou senha inválidos.');
+            } else {
+                setError('Não foi possível entrar agora. Tente novamente em instantes.');
+            }
         } finally {
             setSubmitting(false);
         }
