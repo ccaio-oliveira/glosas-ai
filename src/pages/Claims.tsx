@@ -109,9 +109,11 @@ export default function Claims() {
     function handleSubmit() {
         setError(null);
 
-        editingId
-            ? updateMutation.mutate({ id: editingId, data: form })
-            : createMutation.mutate(form);
+        if (editingId) {
+            updateMutation.mutate({ id: editingId, data: form });
+        } else {
+            createMutation.mutate(form);
+        }
     }
 
     const isFormValid = form.payer_id !== '' && form.claim_number && form.patient_name && form.total_amount;

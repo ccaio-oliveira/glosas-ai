@@ -1,30 +1,36 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type ClinicInput, getClinic, updateClinic } from "../../lib/clinic";
-import { useEffect, useState } from "react";
+import { type Clinic, type ClinicInput, getClinic, updateClinic } from "../../lib/clinic";
+import { useState } from "react";
 import { Card } from "../ui/Card";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { useCan } from "../../contexts/AuthContext";
+
+function toForm(clinic: Clinic): ClinicInput {
+    return {
+        name: clinic.name,
+        cnpj: clinic.cnpj,
+        cro: clinic.cro ?? '',
+        phone: clinic.phone ?? '',
+        email: clinic.email ?? '',
+        address: clinic.address ?? '',
+    };
+}
 
 export function ClinicPanel() {
     const queryClient = useQueryClient();
     const can = useCan();
     const { data: clinic } = useQuery({ queryKey: ['clinic'], queryFn: getClinic });
 
-    const [form, setForm] = useState<ClinicInput>({ name: '', cnpj: '' });
+    // O formulário é reposto sempre que o objeto da clínica muda (carga, refetch,
+    // retorno do salvamento). Ajuste durante o render em vez de useEffect.
+    const [form, setForm] = useState<ClinicInput>(() => (clinic ? toForm(clinic) : { name: '', cnpj: '' }));
+    const [syncedClinic, setSyncedClinic] = useState(clinic);
 
-    useEffect(() => {
-        if (clinic) {
-            setForm({
-                name: clinic.name,
-                cnpj: clinic.cnpj,
-                cro: clinic.cro ?? '',
-                phone: clinic.phone ?? '',
-                email: clinic.email ?? '',
-                address: clinic.address ?? '',
-            });
-        }
-    }, [clinic]);
+    if (clinic !== syncedClinic) {
+        setSyncedClinic(clinic);
+        if (clinic) setForm(toForm(clinic));
+    }
 
     const updateMutation = useMutation({
         mutationFn: updateClinic,

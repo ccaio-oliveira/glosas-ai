@@ -5,7 +5,8 @@ import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "../components/ui/Card";
-import { STATUS_OPTIONS, StatusBadge } from "../components/data/StatusBadge";
+import { StatusBadge } from "../components/data/StatusBadge";
+import { STATUS_OPTIONS } from "../components/data/statusOptions";
 import clsx from "clsx";
 
 const CATEGORY_STYLE: Record<DenialCategory, string> = {

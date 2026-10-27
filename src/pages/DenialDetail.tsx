@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate } from "../lib/denials";
-import { useEffect, useState } from "react";
-import { STATUS_OPTIONS, StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
+import { useState } from "react";
+import { StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
+import { STATUS_OPTIONS } from "../components/data/statusOptions";
 import { AppLayout } from "../components/layout/AppLayout";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -41,13 +42,19 @@ export default function DenialDetail() {
         queryFn: () => getDenial(denialId),
     });
 
-    const [text, setText] = useState('');
+    // Texto vindo do servidor; quando muda (carga, geração, salvamento), o editor
+    // é reposto com ele. Ajuste durante o render em vez de useEffect, que faria um
+    // render extra com o texto antigo.
+    const serverText = denial?.appeal?.ai_generated_text ?? '';
+    const [text, setText] = useState(serverText);
+    const [syncedText, setSyncedText] = useState(serverText);
     const [genInfo, setGenInfo] = useState<GenerateAppealResult | null>(null);
     const [genError, setGenError] = useState<string | null>(null);
 
-    useEffect(() => {
-        setText(denial?.appeal?.ai_generated_text ?? '');
-    }, [denial?.appeal?.ai_generated_text]);
+    if (serverText !== syncedText) {
+        setSyncedText(serverText);
+        setText(serverText);
+    }
 
     const invalidate = () => {
         queryClient.invalidateQueries({ queryKey: ['denial', denialId] });
