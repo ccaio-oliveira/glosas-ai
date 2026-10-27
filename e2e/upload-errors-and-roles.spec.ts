@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import path from "node:path";
-import { FIXTURES_DIR } from "./support/env";
+import { API_URL, FIXTURES_DIR, SPA_URL } from "./support/env";
 import { storageStateFor } from "./support/users";
 
 test.describe('upload de arquivo inválido (dona da clínica)', () => {
@@ -35,20 +35,25 @@ test.describe('operador da SaaS (super_admin)', () => {
         expect(pageErrors).toEqual([]);
     });
 
-    // Achado M6 da auditoria (2026-10-26), confirmado aqui: o super_admin lê as glosas de
-    // todas as clínicas em /denials (scope de tenant desligado + Gate::before). Aguarda
-    // decisão do Product Owner. test.fail() mantém a suíte verde e avisa quando o
-    // comportamento mudar ("expected to fail, but passed") — aí remova a marcação.
-    // Só a asserção do vazamento fica aqui, para o test.fail() não esconder outra falha.
-    // Depende de denial-flow.spec.ts ter criado glosas antes (ordem alfabética, 1 worker):
-    // rodado sozinho o banco não tem glosas e ele acusa "passed" — falso alarme.
-    test('/api/denials não devolve glosas de clínica ao super_admin', async ({ page }) => {
-        test.fail();
+    // Achado M6 (corrigido em 2026-10-27): o super_admin não acessa as telas nem a API
+    // da clínica. A tela só redireciona; quem barra de fato é a API (403).
+    test('tela da clínica redireciona para o painel, sem chamar /api/denials', async ({ page }) => {
+        const denialCalls: string[] = [];
+        page.on('request', (req) => { if (/\/api\/denials/.test(req.url())) denialCalls.push(req.url()); });
 
-        const response = page.waitForResponse((res) => /\/api\/denials(\?|$)/.test(res.url()) && res.request().method() === 'GET');
         await page.goto('/denials');
-        const body = await (await response).json();
+        await expect(page).toHaveURL(/\/admin\/errors$/);
+        expect(denialCalls).toEqual([]);
+    });
 
-        expect(Array.isArray(body) ? body : body.data).toEqual([]);
+    test('API da clínica responde 403 e o painel continua acessível', async ({ page }) => {
+        // Referer do SPA: sem ele o Sanctum não trata a chamada como sessão (daria 401).
+        const headers = { Accept: 'application/json', Referer: `${SPA_URL}/` };
+
+        for (const path of ['/api/denials', '/api/claims', '/api/reports/recovery', '/api/clinic']) {
+            const res = await page.request.get(`${API_URL}${path}`, { headers });
+            expect(res.status(), path).toBe(403);
+        }
+        expect((await page.request.get(`${API_URL}/api/admin/error-logs`, { headers })).status()).toBe(200);
     });
 });
