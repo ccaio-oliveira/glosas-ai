@@ -32,6 +32,8 @@ export interface AppealDeadline {
     /** Negativo quando vencido. */
     days_left: number | null;
     deadline_days: number | null;
+    /** Fonte cadastrada no convênio (texto do usuário). null se não informada. */
+    deadline_source: string | null;
 }
 
 export interface Appeal {
@@ -110,7 +112,7 @@ export interface DenialFilters {
     from?: string;
     to?: string;
     /** `due_soon` inclui as vencidas — é a lista do que exige ação agora. */
-    deadline?: '' | 'due_soon' | 'overdue' | 'not_configured';
+    deadline?: '' | 'due_soon' | 'overdue' | 'on_track' | 'not_configured' | 'not_applicable';
 }
 
 /**

@@ -26,6 +26,18 @@ const style: Record<AppealDeadline['status'], string> = {
     not_applicable: 'text-text-muted',
 };
 
+function tooltip(deadline: AppealDeadline): string | undefined {
+    if (deadline.status === 'not_configured') {
+        return 'Prazo não cadastrado — consulte o contrato com o convênio.';
+    }
+
+    if (!deadline.due_date) return undefined;
+
+    const base = `Vence em ${formatDate(deadline.due_date)}`;
+
+    return deadline.deadline_days ? `${base} · prazo de ${deadline.deadline_days} dias corridos` : base;
+}
+
 /**
  * Prazo para recurso numa célula de tabela. O `title` mostra a data exata —
  * a contagem em dias é o que se lê de relance, a data é o que se confere.
@@ -35,7 +47,7 @@ export function DeadlineBadge({ deadline }: { deadline: AppealDeadline }) {
 
     return (
         <span
-            title={deadline.due_date ? `Vence em ${formatDate(deadline.due_date)}` : undefined}
+            title={tooltip(deadline)}
             className={cn('whitespace-nowrap text-xs tabular-nums', pill && 'rounded px-1.5 py-0.5', style[deadline.status])}
         >
             {label(deadline)}

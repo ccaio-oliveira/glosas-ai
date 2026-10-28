@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate } from "../lib/denials";
 import { useState } from "react";
 import { StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
@@ -138,6 +138,29 @@ export default function DenialDetail() {
                                 </div>
 
                                 <DeadlineBadge deadline={denial.deadline} />
+
+                                {denial.deadline.status === 'not_configured' && (
+                                    <p className="mt-1 text-xs text-text-muted">
+                                        Prazo não cadastrado para este convênio — consulte o contrato.
+                                        {can.operate && (
+                                            <>
+                                                {' '}
+                                                <Link to="/payers" className="font-medium text-brand-600 hover:underline">
+                                                    Configurar prazo
+                                                </Link>
+                                            </>
+                                        )}
+                                    </p>
+                                )}
+
+                                {denial.deadline.status !== 'not_configured' && denial.deadline.status !== 'not_applicable' && (denial.deadline.deadline_days ?? 0) > 0 && (
+                                    <p className="mt-1 text-xs tabular-nums text-text-muted">
+                                        {denial.deadline.deadline_days} dias corridos a partir da identificação ·{' '}
+                                        {denial.deadline.deadline_source
+                                            ? <>Fonte: {denial.deadline.deadline_source}</>
+                                            : <span className="text-warning-600">Fonte não informada</span>}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="col-span-2">
