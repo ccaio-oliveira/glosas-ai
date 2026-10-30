@@ -89,7 +89,9 @@ export default function Claims() {
     function openEditForm(claim: Claim) {
         setEditingId(claim.id);
         setForm({
-            payer_id: claim.payer_id,
+            // `payer` é o convênio como a clínica o vê (cópia privada, se houver);
+            // é ele que existe nas opções do select.
+            payer_id: claim.payer?.id ?? claim.payer_id,
             claim_number: claim.claim_number,
             patient_name: claim.patient_name,
             service_date: claim.service_date ?? '',
