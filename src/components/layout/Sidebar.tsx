@@ -4,13 +4,17 @@ import clsx from "clsx";
 import { roleLabel } from "../../lib/roles";
 import { useQuery } from "@tanstack/react-query";
 import { getDenialSummary } from "../../lib/denials";
-import { BarChart3, FileCheck2, FileX2, LayoutDashboard, ShieldCheck, Upload, Settings } from "lucide-react";
+import { BarChart3, Building2, FileCheck2, FileText, FileX2, LayoutDashboard, ShieldCheck, Upload, Settings } from "lucide-react";
 
 const NAV_ITEMS = [
     { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
     { to: '/denials', label: 'Glosas', Icon: FileX2 },
     { to: '/appeals', label: 'Recursos', Icon: FileCheck2 },
     { to: '/upload', label: 'Upload TISS', Icon: Upload },
+    // Fora do menu do design system, que os tratava como satélites; sem link
+    // fixo, /payers (prazo de recurso) só aparecia por aviso contextual.
+    { to: '/claims', label: 'Guias', Icon: FileText },
+    { to: '/payers', label: 'Convênios', Icon: Building2 },
     { to: '/preventive', label: 'Fat. Preventivo', Icon: ShieldCheck },
     { to: '/reports', label: 'Relatórios', Icon: BarChart3 },
 ];
