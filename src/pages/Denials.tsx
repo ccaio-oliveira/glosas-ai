@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { categoryLabel, formatBRL, formatDate, listDenials, type DenialCategory, type DenialFilters } from "../lib/denials";
+import { categoryLabel, formatBRL, formatDate, listDenials, PATIENT_NOT_INFORMED, type DenialCategory, type DenialFilters } from "../lib/denials";
 import { DeadlineBadge } from "../components/data/DeadlineBadge";
 import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
@@ -133,7 +133,7 @@ export default function Denials() {
                                         className="cursor-pointer border-b border-neutral-50 transition-colors hover:bg-brand-50"
                                     >
                                         <td className="whitespace-nowrap px-3.5 py-2.5 font-mono text-xs text-text-muted">{denial.claim_number}</td>
-                                        <td className="whitespace-nowrap px-3.5 py-2.5 font-medium text-sm text-text-primary">{denial.patient_name}</td>
+                                        <td className="whitespace-nowrap px-3.5 py-2.5 font-medium text-sm text-text-primary">{denial.patient_name ?? <span className="font-normal text-text-muted">{PATIENT_NOT_INFORMED}</span>}</td>
                                         <td className="max-w-[200px] truncate px-3.5 py-2.5 text-xs text-text-secondary">{denial.procedure_description}</td>
                                         <td className="whitespace-nowrap px-3.5 py-2.5 text-xs text-text-secondary">{denial.payer_name}</td>
                                         <td className="px-3.5 py-2.5">

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { MetricCard } from "../components/data/MetricCard";
 import { CalendarClock, Clock, FileCheck2, TrendingUp } from "lucide-react";
-import { formatBRL } from "../lib/denials";
+import { formatBRL, PATIENT_NOT_INFORMED } from "../lib/denials";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { useCan } from "../contexts/AuthContext";
@@ -109,7 +109,7 @@ export default function Appeals() {
                                 {appeals.map((a) => (
                                     <tr key={a.id} className="border-b border-neutral-50 hover:bg-brand-50/40">
                                         <td className="whitespace-nowrap px-3.5 py-2.5 font-mono text-xs text-text-muted">{a.claim_number}</td>
-                                        <td className="whitespace-nowrap px-3.5 py-2.5 text-sm font-medium text-text-primary">{a.patient_name}</td>
+                                        <td className="whitespace-nowrap px-3.5 py-2.5 text-sm font-medium text-text-primary">{a.patient_name ?? <span className="font-normal text-text-muted">{PATIENT_NOT_INFORMED}</span>}</td>
                                         <td className="whitespace-nowrap px-3.5 py-2.5 text-xs text-text-secondary">{a.payer_name}</td>
                                         
                                         <td className="whitespace-nowrap px-3.5 py-2.5 text-xs text-text-secondary">

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate } from "../lib/denials";
+import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate, patientLabel } from "../lib/denials";
 import { useState } from "react";
 import { StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
 import { STATUS_OPTIONS } from "../components/data/statusOptions";
@@ -122,7 +122,10 @@ export default function DenialDetail() {
                     >
                         <div className="grid grid-cols-2 gap-4">
                             <Field label="Nº da guia" value={denial.claim_number ?? '-'} mono />
-                            <Field label="Paciente" value={denial.patient_name ?? '-'} />
+                            <Field label="Paciente" value={patientLabel(denial.patient_name)} />
+                            {denial.beneficiary_card_number && (
+                                <Field label="Carteira do beneficiário" value={denial.beneficiary_card_number} mono />
+                            )}
                             <Field label="Procedimento" value={denial.procedure_description ?? '-'} />
                             <Field label="Código TUSS" value={denial.procedure_code ?? '-'} mono />
                             <Field label="Convênio" value={denial.payer_name ?? '-'} />
@@ -176,6 +179,13 @@ export default function DenialDetail() {
                                     {denial.reason_code && <span className="mr-2 font-mono font-semibold">{denial.reason_code}</span>}
                                     {denial.reason_description ?? 'Não informado'}
                                 </div>
+
+                                {denial.reason_codes.length > 1 && (
+                                    <p className="mt-2 text-xs text-text-secondary">
+                                        A operadora informou {denial.reason_codes.length} códigos para este item:{' '}
+                                        <span className="font-mono">{denial.reason_codes.join(', ')}</span>. A classificação usa o primeiro.
+                                    </p>
+                                )}
 
                                 {denial.needs_ai_review && (
                                     <p className="mt-2 text-xs text-warning-600">

@@ -6,7 +6,9 @@ export interface Claim {
     payer_id: number;
     payer?: { id: number; name: string; ans_registry_code: string | null };
     claim_number: string;
-    patient_name: string;
+    /** Nulo quando o demonstrativo não traz o nome (TISS 4.x). */
+    patient_name: string | null;
+    beneficiary_card_number: string | null;
     /** Data do atendimento, vinda do XML. Null em guia lançada à mão sem preencher. */
     service_date: string | null;
     total_amount: string;

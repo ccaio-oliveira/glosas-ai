@@ -6,7 +6,9 @@ export type DenialCategory = 'administrative' | 'technical' | 'linear' | 'unknow
 export interface Denial {
     id: number;
     claim_number: string | null;
+    /** Nulo quando o demonstrativo não traz o nome (TISS 4.x): use `patientLabel`. */
     patient_name: string | null;
+    beneficiary_card_number: string | null;
     payer_name: string | null;
     service_date: string | null;
     procedure_code: string | null;
@@ -15,6 +17,8 @@ export interface Denial {
     paid_amount: number;
     category: DenialCategory;
     reason_code: string | null;
+    /** Todos os códigos de glosa do item, na ordem do arquivo; o primeiro é `reason_code`. */
+    reason_codes: string[];
     reason_description: string | null;
     amount: number;
     status: DenialStatus;
@@ -123,6 +127,13 @@ export interface DenialFilters {
  * quando o model vai direto pro JSON). Concatenar 'T00:00:00' no segundo formato
  * gerava "Invalid Date" — os dois convivem na API, então o helper trata os dois.
  */
+/** O demonstrativo TISS 4.x não traz o nome do beneficiário — dizer isso, não inventar. */
+export const PATIENT_NOT_INFORMED = 'Não informado no XML';
+
+export function patientLabel(name: string | null | undefined) {
+    return name || PATIENT_NOT_INFORMED;
+}
+
 export function formatDate(date: string | null | undefined) {
     if (!date) return '—';
 

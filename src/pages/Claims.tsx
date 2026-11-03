@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClaim, deleteClaim, listClaims, updateClaim, type Claim, type ClaimInput } from "../lib/claims";
-import { formatDate } from "../lib/denials";
+import { formatDate, PATIENT_NOT_INFORMED } from "../lib/denials";
 import { useCan } from "../contexts/AuthContext";
 import { listPayers } from "../lib/payers";
 import { useState } from "react";
@@ -48,6 +48,8 @@ export default function Claims() {
     const [to, setTo] = useState('');
 
     const [editingId, setEditingId] = useState<number | null>(null);
+    // Guia de demonstrativo TISS 4.x chega sem nome: editar não obriga a inventar um.
+    const [nameOptional, setNameOptional] = useState(false);
     const [form, setForm] = useState<ClaimInput>(emptyForm);
     const [showForm, setShowForm] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -81,6 +83,7 @@ export default function Claims() {
 
     function openCreateForm() {
         setEditingId(null);
+        setNameOptional(false);
         setForm(emptyForm);
         setError(null);
         setShowForm(true);
@@ -88,12 +91,13 @@ export default function Claims() {
 
     function openEditForm(claim: Claim) {
         setEditingId(claim.id);
+        setNameOptional(claim.patient_name === null);
         setForm({
             // `payer` é o convênio como a clínica o vê (cópia privada, se houver);
             // é ele que existe nas opções do select.
             payer_id: claim.payer?.id ?? claim.payer_id,
             claim_number: claim.claim_number,
-            patient_name: claim.patient_name,
+            patient_name: claim.patient_name ?? '',
             service_date: claim.service_date ?? '',
             total_amount: claim.total_amount,
         });
@@ -118,7 +122,7 @@ export default function Claims() {
         }
     }
 
-    const isFormValid = form.payer_id !== '' && form.claim_number && form.patient_name && form.total_amount;
+    const isFormValid = form.payer_id !== '' && form.claim_number && (form.patient_name || nameOptional) && form.total_amount;
     const isSaving = createMutation.isPending || updateMutation.isPending;
     const hasFilters = !!(search || from || to);
 
@@ -165,7 +169,8 @@ export default function Claims() {
 
                             <Input
                                 label="Nome do paciente"
-                                required
+                                required={!nameOptional}
+                                placeholder={nameOptional ? PATIENT_NOT_INFORMED : undefined}
                                 value={form.patient_name}
                                 onChange={(e) => setForm({ ...form, patient_name: e.target.value })}
                             />
@@ -275,7 +280,7 @@ export default function Claims() {
                                             </td>
 
                                             <td className="whitespace-nowrap px-3.5 py-2.5 text-sm font-medium text-text-primary">
-                                                {claim.patient_name}
+                                                {claim.patient_name ?? <span className="font-normal text-text-muted">{PATIENT_NOT_INFORMED}</span>}
                                             </td>
 
                                             <td className="whitespace-nowrap px-3.5 py-2.5 text-xs text-text-secondary">
