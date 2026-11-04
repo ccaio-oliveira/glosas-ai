@@ -20,11 +20,27 @@ export interface Denial {
     /** Todos os códigos de glosa do item, na ordem do arquivo; o primeiro é `reason_code`. */
     reason_codes: string[];
     reason_description: string | null;
+    /** Vigência do código na data em que a operadora emitiu a glosa. Nulo: glosa anterior à checagem. */
+    reason_code_validity: ReasonCodeValidity | null;
+    reason_reference_date: string | null;
     amount: number;
     status: DenialStatus;
     needs_ai_review: boolean;
     identified_at: string | null;
     deadline: AppealDeadline;
+}
+
+export type ReasonCodeValidity = 'valid' | 'not_valid_at_date' | 'date_unknown' | 'no_validity_data' | 'not_in_catalog' | 'missing';
+
+/**
+ * O código existe na Tabela 38, mas o GlosasAI ainda não o classificou (categoria `unknown`).
+ * Não diz nada sobre vigência — isso é `reason_code_validity`.
+ */
+export function awaitsClassification(denial: Pick<Denial, 'category' | 'reason_code_validity'>) {
+    return denial.category === 'unknown'
+        && denial.reason_code_validity !== null
+        && denial.reason_code_validity !== 'not_in_catalog'
+        && denial.reason_code_validity !== 'missing';
 }
 
 export type DeadlineStatus = 'on_track' | 'due_soon' | 'overdue' | 'not_configured' | 'not_applicable';

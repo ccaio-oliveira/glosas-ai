@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate, patientLabel } from "../lib/denials";
+import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate, patientLabel, awaitsClassification } from "../lib/denials";
 import { useState } from "react";
 import { StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
 import { STATUS_OPTIONS } from "../components/data/statusOptions";
@@ -187,9 +187,31 @@ export default function DenialDetail() {
                                     </p>
                                 )}
 
-                                {denial.needs_ai_review && (
+                                {awaitsClassification(denial) ? (
+                                    <p className="mt-2 text-xs text-warning-600">
+                                        Código da Tabela 38 ainda sem classificação no GlosasAI. O recurso precisa ser redigido manualmente.
+                                    </p>
+                                ) : denial.needs_ai_review && (
                                     <p className="mt-2 text-xs text-warning-600">
                                         Código não catalogado na Tabela 38 - precisa de análise antes de contestar.
+                                    </p>
+                                )}
+
+                                {denial.reason_code_validity === 'not_valid_at_date' && (
+                                    <p className="mt-2 text-xs text-warning-600">
+                                        Código fora de vigência na Tabela 38 em {formatDate(denial.reason_reference_date)} (data de emissão do demonstrativo). A descrição é a do último período em que valeu.
+                                    </p>
+                                )}
+
+                                {denial.reason_code_validity === 'date_unknown' && (
+                                    <p className="mt-2 text-xs text-text-secondary">
+                                        Vigência não verificada: o arquivo não informa a data de emissão do demonstrativo.
+                                    </p>
+                                )}
+
+                                {denial.reason_code_validity === 'valid' && (
+                                    <p className="mt-2 text-xs text-text-muted">
+                                        Código vigente na Tabela 38 em {formatDate(denial.reason_reference_date)} (data de emissão do demonstrativo).
                                     </p>
                                 )}
                             </div>

@@ -34,4 +34,6 @@ test('detalhe mostra a carteira e os dois códigos do item', async ({ page }) =>
 
     await expect(page.getByText('CART000000001')).toBeVisible();
     await expect(page.getByText('3054, 3172')).toBeVisible();
+    // GL-TISS-003: vigência conferida na data de emissão do demonstrativo (2026-10-20).
+    await expect(page.getByText('Código vigente na Tabela 38 em 20/10/2026', { exact: false })).toBeVisible();
 });
