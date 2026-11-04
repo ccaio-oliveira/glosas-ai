@@ -77,8 +77,12 @@ export default function DenialDetail() {
             invalidate();
         },
         onError: (error) => {
-            const status = (error as { response?: { status?: number } }).response?.status;
-            setGenError(status === 422 ? 'Nenhum modelo cobre este código ainda - escreva o recurso manualmente por enquanto.' : 'Falha ao gerar o recurso. Verifique o console para detalhes.');
+            const response = (error as { response?: { status?: number; data?: { message?: string } } }).response;
+            // 422 = sem geração automática; o servidor diz o motivo (sem modelo, código sem
+            // classificação, código fora de vigência). O recurso manual continua disponível.
+            setGenError(response?.status === 422
+                ? response.data?.message ?? 'Nenhum modelo cobre este código ainda - escreva o recurso manualmente por enquanto.'
+                : 'Falha ao gerar o recurso. Verifique o console para detalhes.');
             setGenInfo(null);
         },
     });

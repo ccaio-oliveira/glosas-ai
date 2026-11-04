@@ -28,7 +28,8 @@ test.describe('dona da clínica', () => {
 
     test('gerar, editar e salvar o recurso persiste após recarregar', async ({ page }) => {
         await page.goto('/denials');
-        await page.locator('tbody tr').first().click();
+        // Glosa 3081, vigente na data do demonstrativo (10/08/2026): gera por modelo.
+        await page.locator('tbody tr').filter({ hasText: 'João Pereira Lima' }).click();
         await expect(page).toHaveURL(/\/denials\/\d+$/);
         denialPath = new URL(page.url()).pathname;
 
@@ -45,6 +46,24 @@ test.describe('dona da clínica', () => {
 
         await page.reload();
         await expect(editor).toHaveValue(/Observação E2E\.$/);
+    });
+
+    test('código fora de vigência não gera automático, mas aceita recurso manual', async ({ page }) => {
+        await page.goto('/denials');
+        // Glosa 1402: código inativado em 30/06/2026, demonstrativo de 10/08/2026 (GL-TISS-003).
+        await page.locator('tbody tr').filter({ hasText: 'Maria Oliveira Santos' }).click();
+        await expect(page).toHaveURL(/\/denials\/\d+$/);
+
+        await page.getByRole('button', { name: 'Gerar recurso' }).click();
+        await expect(page.getByText('não estava vigente na Tabela 38 em 10/08/2026', { exact: false })).toBeVisible();
+
+        const editor = page.getByPlaceholder('Escreva o texto do recurso de defesa...');
+        await editor.fill('Recurso redigido manualmente (E2E).');
+        await page.getByRole('button', { name: 'Salvar', exact: true }).click();
+        await expect(page.getByRole('button', { name: 'Salvo', exact: true })).toBeVisible();
+
+        await page.reload();
+        await expect(editor).toHaveValue('Recurso redigido manualmente (E2E).');
     });
 
     test('status da glosa oferece as 5 opções e grava a escolhida', async ({ page }) => {
