@@ -5,6 +5,7 @@ import { FRONTEND_DIR } from "./env";
 export const USERS = {
     owner: { email: 'ana@clinica-exemplo.com', password: 'password', home: /\/dashboard$/ },
     otherClinic: { email: 'bruno@clinica-isolamento.test', password: 'password', home: /\/dashboard$/ },
+    classification: { email: 'carla@clinica-classificacao.test', password: 'password', home: /\/dashboard$/ },
     superAdmin: { email: 'admin@glosasai.com.br', password: 'password', home: /\/admin\/errors$/ },
 } as const;
 

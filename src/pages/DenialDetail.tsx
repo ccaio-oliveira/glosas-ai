@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate, patientLabel, awaitsClassification } from "../lib/denials";
+import { categoryLabel, downloadAppealPdf, formatBRL, generateAppeal, type GenerateAppealResult, getDenial, saveAppeal, sourceLabel, submitAppeal, updateDenialStatus, formatDate, patientLabel, type DenialDetail as DenialDetailData } from "../lib/denials";
 import { useState } from "react";
 import { StatusBadge, type DenialStatus } from "../components/data/StatusBadge";
 import { STATUS_OPTIONS } from "../components/data/statusOptions";
@@ -28,6 +28,26 @@ function Field({ label, value, mono, highlight }: { label: string; value: string
             </div>
         </div>
     );
+}
+
+/** O que dizer sobre a classificação; a vigência tem os próprios avisos. */
+function classificationNotice({ category, classification }: DenialDetailData) {
+    if (classification.automatic_appeal_block === 'appeal_accepted_code') {
+        return 'A redação oficial do código 3095 é "RECURSO DE GLOSA ACATADO", que não descreve uma recusa. Como o demonstrativo informa valor glosado neste item, confira-o antes de contestar. Não há geração automática.';
+    }
+
+    switch (classification.status) {
+        case 'missing':
+            return 'Motivo não informado pela operadora - precisa de análise antes de contestar.';
+        case 'not_in_catalog':
+            return 'Código não catalogado na Tabela 38 - precisa de análise antes de contestar.';
+        case 'awaiting_classification':
+            return 'Código da Tabela 38 ainda sem classificação no GlosasAI. O recurso precisa ser redigido manualmente.';
+        case 'stale':
+            return `A classificação gravada nesta glosa (${categoryLabel[category]}) está desatualizada: ${classification.catalog_category ? `no catálogo atual é ${categoryLabel[classification.catalog_category]}` : 'o código não consta do catálogo atual'}. A geração automática fica bloqueada até a reconciliação; o recurso pode ser redigido manualmente.`;
+        default:
+            return null;
+    }
 }
 
 export default function DenialDetail() {
@@ -191,14 +211,14 @@ export default function DenialDetail() {
                                     </p>
                                 )}
 
-                                {awaitsClassification(denial) ? (
-                                    <p className="mt-2 text-xs text-warning-600">
-                                        Código da Tabela 38 ainda sem classificação no GlosasAI. O recurso precisa ser redigido manualmente.
+                                {denial.classification.catalog_description && (
+                                    <p className="mt-2 text-xs text-text-secondary">
+                                        Descrição atual na Tabela 38: {denial.classification.catalog_description}
                                     </p>
-                                ) : denial.needs_ai_review && (
-                                    <p className="mt-2 text-xs text-warning-600">
-                                        Código não catalogado na Tabela 38 - precisa de análise antes de contestar.
-                                    </p>
+                                )}
+
+                                {classificationNotice(denial) && (
+                                    <p className="mt-2 text-xs text-warning-600">{classificationNotice(denial)}</p>
                                 )}
 
                                 {denial.reason_code_validity === 'not_valid_at_date' && (

@@ -32,17 +32,6 @@ export interface Denial {
 
 export type ReasonCodeValidity = 'valid' | 'not_valid_at_date' | 'date_unknown' | 'no_validity_data' | 'not_in_catalog' | 'missing';
 
-/**
- * O código existe na Tabela 38, mas o GlosasAI ainda não o classificou (categoria `unknown`).
- * Não diz nada sobre vigência — isso é `reason_code_validity`.
- */
-export function awaitsClassification(denial: Pick<Denial, 'category' | 'reason_code_validity'>) {
-    return denial.category === 'unknown'
-        && denial.reason_code_validity !== null
-        && denial.reason_code_validity !== 'not_in_catalog'
-        && denial.reason_code_validity !== 'missing';
-}
-
 export type DeadlineStatus = 'on_track' | 'due_soon' | 'overdue' | 'not_configured' | 'not_applicable';
 
 /** Prazo para recorrer, calculado no backend a partir do contrato do convênio. */
@@ -75,9 +64,26 @@ export interface TussComparison {
     description_matches: boolean | null;
 }
 
+/**
+ * A categoria da glosa (gravada na importação) frente ao catálogo atual. Quem decide é o
+ * servidor: a categoria sozinha não separa "não catalogado" de "desatualizada".
+ */
+export type ClassificationStatus = 'missing' | 'not_in_catalog' | 'awaiting_classification' | 'stale' | 'current';
+
+export type AutomaticAppealBlock = 'appeal_accepted_code' | 'not_valid_at_date' | 'awaiting_classification' | 'stale_classification';
+
+export interface DenialClassification {
+    status: ClassificationStatus;
+    catalog_category: Exclude<DenialCategory, 'unknown'> | null;
+    /** Redação atual, só quando a glosa guardou o texto de "não catalogado". */
+    catalog_description: string | null;
+    automatic_appeal_block: AutomaticAppealBlock | null;
+}
+
 export interface DenialDetail extends Denial {
     appeal: Appeal | null;
     tuss: TussComparison | null;
+    classification: DenialClassification;
 }
 
 export interface DenialSummary {
